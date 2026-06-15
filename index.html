@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lộc Linh Solar — Tính Tiết Kiệm Điện 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Be+Vietnam+Pro:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:  #0F6B3A;
+  --green2: #14A44D;
+  --gold:   #E2B23B;
+  --gold2:  #FFD666;
+  --bg:     #F0F7F2;
+  --card:   #FFFFFF;
+  --ink:    #333333;
+  --muted:  #6B7A70;
+  --line:   #DCE8DF;
+  --soft:   #E8F3EC;
+  --red:    #C0392B;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Be Vietnam Pro', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+header {
+  background: linear-gradient(135deg, var(--green), var(--green2));
+  border-bottom: 3px solid var(--gold);
+  padding: 14px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.logo-sun { font-size: 28px; }
+.logo-text { font-family:'Oswald',sans-serif; font-size:20px; font-weight:700; color:var(--gold2); letter-spacing:1px; }
+.logo-sub { font-size:11px; color:#D7EEDF; margin-top:1px; }
+.header-phone {
+  margin-left:auto;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--green);
+  font-family:'Oswald',sans-serif; font-size:15px; font-weight:700;
+  padding:8px 18px; border-radius:8px;
+  text-decoration:none; letter-spacing:1px; white-space:nowrap;
+  box-shadow: 0 2px 8px rgba(226,178,59,.4);
+}
+
+main { flex:1; max-width:620px; width:100%; margin:0 auto; padding:32px 20px 48px; }
+
+.page-title {
+  font-family:'Oswald',sans-serif; font-size:36px; font-weight:700;
+  color:var(--green); line-height:1.1; margin-bottom:6px;
+}
+.page-title span { color:var(--gold); }
+.page-sub { font-size:13px; color:var(--muted); margin-bottom:8px; }
+.evn-badge {
+  display:inline-block; font-size:11px; font-weight:700;
+  background:var(--soft); color:var(--green);
+  border:1px solid var(--green2);
+  padding:4px 12px; border-radius:20px; margin-bottom:24px;
+}
+
+/* ── CARD CHUNG ─────────────────────────────── */
+.input-card, .result-card, .sec-card {
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 2px 12px rgba(15,107,58,.06);
+}
+.input-card { padding:24px; margin-bottom:16px; }
+
+.field-label { font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+.input-wrap {
+  display:flex; align-items:center;
+  background:var(--soft);
+  border:2px solid var(--line); border-radius:10px;
+  overflow:hidden; transition:border-color .2s;
+}
+.input-wrap:focus-within { border-color:var(--green2); }
+.input-prefix { padding:0 14px; font-size:20px; border-right:1px solid var(--line); line-height:56px; flex-shrink:0; }
+.bill-input {
+  flex:1; background:transparent; border:none; outline:none;
+  font-family:'Be Vietnam Pro',sans-serif;
+  font-size:26px; font-weight:700; color:var(--green);
+  padding:12px 16px; width:100%;
+  -moz-appearance:textfield;
+}
+.bill-input::-webkit-outer-spin-button,
+.bill-input::-webkit-inner-spin-button { -webkit-appearance:none; }
+.bill-input::placeholder { color:#A9C4B2; font-weight:400; font-size:18px; }
+.input-suffix { padding:0 16px; font-size:13px; color:var(--muted); flex-shrink:0; }
+
+.quick-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.quick-label { font-size:11px; color:var(--muted); align-self:center; flex-shrink:0; }
+.qbtn {
+  background:var(--card); border:1px solid var(--line); border-radius:20px;
+  padding:5px 13px; font-size:12px; font-weight:600; color:var(--muted);
+  cursor:pointer; font-family:'Be Vietnam Pro',sans-serif; transition:all .2s;
+}
+.qbtn:hover, .qbtn.active { border-color:var(--green2); color:var(--green); background:var(--soft); }
+
+.calc-btn {
+  width:100%;
+  background:linear-gradient(135deg, var(--green), var(--green2));
+  color:#fff;
+  font-family:'Oswald',sans-serif; font-size:18px; font-weight:700;
+  padding:16px; border-radius:10px; border:none; cursor:pointer;
+  letter-spacing:1px; margin-top:16px;
+  box-shadow:0 4px 14px rgba(15,107,58,.3);
+  transition:filter .2s, transform .15s;
+}
+.calc-btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
+.calc-btn:active { transform:translateY(0); }
+
+/* ── RESULT ─────────────────────────────────── */
+.result-card { overflow:hidden; display:none; animation:fadeUp .35s ease; margin-bottom:16px; }
+.result-card.show { display:block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+
+.result-header {
+  background:linear-gradient(135deg, rgba(226,178,59,.18), rgba(255,214,102,.08));
+  border-bottom:1px solid var(--line);
+  padding:16px 20px; display:flex; align-items:center; gap:12px;
+}
+.result-header-icon { font-size:22px; }
+.result-header-label { font-family:'Oswald',sans-serif; font-size:13px; font-weight:700; letter-spacing:1px; color:var(--green); }
+.result-header-bill { font-size:12px; color:var(--muted); margin-top:2px; }
+
+.result-hero { padding:24px 20px 16px; text-align:center; border-bottom:1px solid var(--line); }
+.result-hero-label { font-size:11px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+.result-hero-num { font-family:'Oswald',sans-serif; font-size:52px; font-weight:700; color:var(--green2); line-height:1; }
+.result-hero-sub { font-size:13px; color:var(--muted); margin-top:6px; }
+
+.result-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); }
+.stat { background:var(--card); padding:16px 18px; }
+.stat-label { font-size:10px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:6px; }
+.stat-val { font-family:'Oswald',sans-serif; font-size:26px; font-weight:700; color:var(--ink); line-height:1; }
+.stat-val.gold  { color:var(--gold); }
+.stat-val.green { color:var(--green2); }
+.stat-val.deep  { color:var(--green); }
+.stat-note { font-size:11px; color:var(--muted); margin-top:5px; line-height:1.4; }
+
+.bar-section { padding:16px 20px; border-top:1px solid var(--line); }
+.bar-labels { display:flex; justify-content:space-between; font-size:11px; margin-bottom:8px; }
+.bar-track { background:var(--soft); border-radius:4px; height:10px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:4px; background:linear-gradient(90deg, var(--gold), var(--green2)); transition:width 1s ease; width:0%; }
+
+.timeline { padding:16px 20px; border-top:1px solid var(--line); }
+.timeline-label { font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+.tl-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.tl-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.tl-text { font-size:13px; color:var(--muted); }
+.tl-text strong { color:var(--ink); }
+
+.result-cta { padding:18px 20px; background:var(--soft); border-top:1px solid var(--line); }
+.result-disclaimer { padding:12px 20px; font-size:11.5px; line-height:1.5; color:var(--muted); background:#FFF8E8; border-top:1px solid var(--line); }
+.cta-row { display:flex; gap:10px; flex-wrap:wrap; }
+.cta-call, .cta-zalo, .cta-form, .cta-cat {
+  flex:1; min-width:140px;
+  font-family:'Oswald',sans-serif; font-size:15px; font-weight:700;
+  padding:13px 16px; border-radius:8px; border:none; cursor:pointer;
+  letter-spacing:1px; text-align:center; text-decoration:none; display:block;
+  transition:filter .2s, border-color .2s;
+}
+.cta-call { background:linear-gradient(135deg, var(--green), var(--green2)); color:#fff; box-shadow:0 3px 10px rgba(15,107,58,.25); }
+.cta-call:hover { filter:brightness(1.1); }
+.cta-zalo { background:var(--card); color:var(--green); border:1px solid var(--green2); }
+.cta-zalo:hover { border-color:var(--green); background:var(--soft); }
+.cta-note { font-size:11px; color:var(--muted); margin-top:10px; text-align:center; }
+
+/* ── SECTION CARDS (EVN / COMBO / TRẢ GÓP / TƯ VẤN) ── */
+.sec-card { margin-bottom:16px; overflow:hidden; }
+.sec-head {
+  background:linear-gradient(135deg, var(--green), var(--green2));
+  padding:14px 20px;
+  display:flex; align-items:center; gap:10px;
+}
+.sec-head.goldhead { background:linear-gradient(135deg, var(--gold), var(--gold2)); }
+.sec-head-icon { font-size:20px; }
+.sec-head-title { font-family:'Oswald',sans-serif; font-size:15px; font-weight:700; letter-spacing:1px; color:#fff; }
+.sec-head.goldhead .sec-head-title { color:var(--green); }
+.sec-head-sub { font-size:11px; color:rgba(255,255,255,.85); margin-top:1px; }
+.sec-head.goldhead .sec-head-sub { color:rgba(15,107,58,.8); }
+.sec-body { padding:18px 20px; }
+
+/* EVN table */
+.evn-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+.evn-table th {
+  background:var(--soft); color:var(--green);
+  font-size:10.5px; letter-spacing:.5px; text-transform:uppercase;
+  padding:8px 10px; text-align:left; border-bottom:2px solid var(--green2);
+}
+.evn-table td { padding:8px 10px; border-bottom:1px solid var(--line); }
+.evn-table tr:last-child td { border-bottom:none; }
+.evn-table .pr { text-align:right; font-weight:700; font-family:'Oswald',sans-serif; font-size:14px; color:var(--green); }
+.evn-table tr.hot td { background:#FFF8E8; }
+.evn-table tr.hot .pr { color:var(--red); }
+.evn-note { font-size:11px; color:var(--muted); margin-top:10px; line-height:1.5; }
+.peak-box {
+  margin-top:14px; background:#FFF8E8;
+  border:1px dashed var(--gold); border-radius:10px;
+  padding:12px 14px; font-size:12.5px; line-height:1.6;
+}
+.peak-box strong { color:var(--red); }
+.peak-box .pb-title { font-weight:700; color:var(--green); margin-bottom:4px; }
+
+/* Trả góp */
+.tg-pick { display:flex; gap:8px; margin-bottom:14px; }
+.tg-amt {
+  flex:1; padding:12px; border-radius:10px;
+  border:2px solid var(--line); background:var(--card);
+  cursor:pointer; text-align:center; transition:all .2s;
+  font-family:'Be Vietnam Pro',sans-serif;
+}
+.tg-amt .ta-num { font-family:'Oswald',sans-serif; font-size:20px; font-weight:700; color:var(--ink); }
+.tg-amt .ta-sub { font-size:11px; color:var(--muted); }
+.tg-amt.active { border-color:var(--gold); background:#FFF8E8; }
+.tg-amt.active .ta-num { color:var(--green); }
+.tg-months { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.tg-m {
+  flex:1; min-width:52px; padding:9px 4px; border-radius:8px;
+  border:1.5px solid var(--line); background:var(--card);
+  font-family:'Oswald',sans-serif; font-size:15px; font-weight:600;
+  color:var(--muted); cursor:pointer; transition:all .2s; text-align:center;
+}
+.tg-m small { display:block; font-size:9px; font-family:'Be Vietnam Pro',sans-serif; font-weight:400; }
+.tg-m.active { border-color:var(--green2); background:var(--soft); color:var(--green); }
+.tg-result {
+  background:linear-gradient(135deg, var(--green), var(--green2));
+  border-radius:12px; padding:18px; text-align:center; color:#fff;
+}
+.tg-r-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; opacity:.85; }
+.tg-r-num { font-family:'Oswald',sans-serif; font-size:40px; font-weight:700; color:var(--gold2); line-height:1.1; margin:4px 0; }
+.tg-r-sub { font-size:12px; opacity:.9; }
+.tg-detail { display:flex; gap:1px; background:rgba(255,255,255,.25); border-radius:8px; overflow:hidden; margin-top:14px; }
+.tg-d { flex:1; background:rgba(255,255,255,.12); padding:10px 6px; }
+.tg-d-label { font-size:9px; letter-spacing:1px; text-transform:uppercase; opacity:.8; }
+.tg-d-val { font-family:'Oswald',sans-serif; font-size:15px; font-weight:700; margin-top:2px; }
+.tg-note { font-size:11px; color:var(--muted); margin-top:12px; line-height:1.5; }
+
+/* Tư vấn CTA section */
+.advise-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.cta-form { background:linear-gradient(135deg, var(--gold), var(--gold2)); color:var(--green); box-shadow:0 3px 10px rgba(226,178,59,.35); }
+.cta-form:hover { filter:brightness(1.06); }
+.cta-cat { background:var(--card); color:var(--green); border:1.5px solid var(--green2); }
+.cta-cat:hover { background:var(--soft); }
+.advise-note { font-size:11.5px; color:var(--muted); margin-top:12px; text-align:center; line-height:1.6; }
+
+
+/* ── NAV ĐIỀU HƯỚNG DÍNH ─────────────────────── */
+.nav-bar {
+  position:sticky; top:0; z-index:50;
+  background:rgba(240,247,242,.92);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  padding:10px 16px;
+  display:flex; gap:8px; overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.nav-bar::-webkit-scrollbar { display:none; }
+.nav-chip {
+  flex-shrink:0;
+  display:flex; align-items:center; gap:6px;
+  background:var(--card);
+  border:1.5px solid var(--line); border-radius:20px;
+  padding:8px 16px;
+  font-family:'Be Vietnam Pro',sans-serif;
+  font-size:12.5px; font-weight:600; color:var(--muted);
+  cursor:pointer; white-space:nowrap;
+  transition:all .25s ease;
+}
+.nav-chip.active {
+  background:linear-gradient(135deg, var(--green), var(--green2));
+  border-color:var(--green);
+  color:#fff;
+  box-shadow:0 3px 10px rgba(15,107,58,.3);
+}
+#calc, #evn, #tragop, #tuvan { scroll-margin-top: 64px; }
+
+footer {
+  background:var(--green);
+  border-top:3px solid var(--gold);
+  padding:16px 24px; text-align:center;
+  font-size:12px; color:#CFE8D8;
+}
+footer strong { color:var(--gold2); }
+
+@media (max-width:480px) {
+  .page-title { font-size:28px; }
+  .bill-input { font-size:22px; }
+  .result-hero-num { font-size:42px; }
+  .stat-val { font-size:22px; }
+  .tg-r-num { font-size:32px; }
+  .advise-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-sun">☀️</div>
+  <div>
+    <div class="logo-text">LỘC LINH SOLAR</div>
+    <div class="logo-sub">Chuyên nghiệp – Uy tín – Bền vững · Nghệ An</div>
+  </div>
+  <a href="tel:0817345555" class="header-phone">📞 0817.345.555</a>
+</header>
+
+<nav class="nav-bar" id="navBar">
+  <button class="nav-chip active" data-target="calc" onclick="gotoSec('calc')">🧮 Tính tiết kiệm</button>
+  <button class="nav-chip" data-target="evn" onclick="gotoSec('evn')">⚡ Giá điện 2026</button>
+  <button class="nav-chip" data-target="tragop" onclick="gotoSec('tragop')">🏦 Trả góp</button>
+  <button class="nav-chip" data-target="tuvan" onclick="gotoSec('tuvan')">📝 Tư vấn</button>
+</nav>
+
+<main>
+  <h1 class="page-title">TÍNH <span>TIẾT KIỆM</span><br>TIỀN ĐIỆN</h1>
+  <p class="page-sub">Nhập hóa đơn điện hàng tháng — kết quả hiện ngay, hoàn toàn miễn phí</p>
+  <div class="evn-badge">✓ Áp dụng biểu giá điện EVN 5 bậc mới nhất 2026</div>
+
+  <!-- INPUT -->
+  <div class="input-card" id="calc">
+    <div class="field-label">💰 Hóa đơn điện hàng tháng của bạn</div>
+    <div class="input-wrap">
+      <div class="input-prefix">🔌</div>
+      <input type="number" id="billInput" class="bill-input" placeholder="2.500.000" min="0" inputmode="numeric" oninput="onInput()">
+      <div class="input-suffix">đ/tháng</div>
+    </div>
+    <div class="quick-row">
+      <span class="quick-label">Chọn nhanh:</span>
+      <button class="qbtn" onclick="setAmount(800000, this)">800k</button>
+      <button class="qbtn" onclick="setAmount(1500000, this)">1,5tr</button>
+      <button class="qbtn" onclick="setAmount(2500000, this)">2,5tr</button>
+      <button class="qbtn" onclick="setAmount(4000000, this)">4tr</button>
+      <button class="qbtn" onclick="setAmount(7000000, this)">7tr</button>
+      <button class="qbtn" onclick="setAmount(12000000, this)">12tr</button>
+    </div>
+    <button class="calc-btn" onclick="calculate()">⚡ TÍNH NGAY</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <div class="result-header-icon">📊</div>
+      <div>
+        <div class="result-header-label">KẾT QUẢ TÍNH TOÁN</div>
+        <div class="result-header-bill" id="rBillLabel">Hóa đơn: —</div>
+      </div>
+    </div>
+    <div class="result-hero">
+      <div class="result-hero-label">💚 Tiết kiệm mỗi tháng</div>
+      <div class="result-hero-num" id="rMonthlySave">—</div>
+      <div class="result-hero-sub" id="rMonthlySaveSub">đồng/tháng</div>
+    </div>
+    <div class="result-grid">
+      <div class="stat">
+        <div class="stat-label">🔢 Điện tiêu thụ ước tính</div>
+        <div class="stat-val deep" id="rKwh">—</div>
+        <div class="stat-note">kWh/tháng theo biểu giá 5 bậc 2026</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">⚡ Công suất lắp</div>
+        <div class="stat-val gold" id="rPower">—</div>
+        <div class="stat-note">kWp phù hợp</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">💵 Tiết kiệm/năm</div>
+        <div class="stat-val deep" id="rYearly">—</div>
+        <div class="stat-note" id="rYearlySub">triệu đồng</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">💎 Lợi nhuận 25 năm</div>
+        <div class="stat-val green" id="rProfit">—</div>
+        <div class="stat-note" id="rProfitSub">sau khi trừ đầu tư</div>
+      </div>
+    </div>
+    <div class="bar-section">
+      <div class="bar-labels">
+        <span style="color:var(--muted)">Hóa đơn hiện tại</span>
+        <span style="color:var(--green2)" id="barPct">Tiết kiệm 70%</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-label">📅 Lộ trình đầu tư</div>
+      <div class="tl-row">
+        <div class="tl-dot" style="background:var(--gold)"></div>
+        <div class="tl-text">Hôm nay: <strong>Lắp đặt, sử dụng điện ngay</strong></div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-dot" style="background:var(--green2)"></div>
+        <div class="tl-text" id="tlPayback">Năm <strong>—</strong>: Hoàn vốn đầu tư</div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-dot" style="background:var(--green)"></div>
+        <div class="tl-text" id="tlFree">Từ năm <strong>—</strong>: <strong>Điện hoàn toàn MIỄN PHÍ</strong></div>
+      </div>
+    </div>
+    <div class="result-disclaimer">📌 Đây là <b>ước tính nhanh</b> dựa trên biểu giá EVN 2026, sản lượng trung bình tại Nghệ An và giả định giá điện tăng ~5%/năm. Con số chính xác phụ thuộc mái nhà, hướng nắng và thói quen dùng điện — Lộc Linh sẽ khảo sát thực tế và báo giá chính xác.</div>
+    <div class="result-cta">
+      <div class="cta-row">
+        <a href="https://loclinhsolar.github.io/form/" class="cta-call" target="_blank" rel="noopener">📋 Điền form nhận báo giá</a>
+        <a href="https://m.me/loclinhdienmay?ref=catalogue" class="cta-zalo" target="_blank" rel="noopener">💬 Nhắn Messenger ngay</a>
+      </div>
+      <div class="cta-note">☀️ Điền form 1 phút · Khảo sát tận nơi · Báo giá trong ngày · Không phát sinh chi phí</div>
+    </div>
+  </div>
+
+  <!-- GIÁ ĐIỆN EVN 2026 -->
+  <div class="sec-card" id="evn">
+    <div class="sec-head">
+      <div class="sec-head-icon">⚡</div>
+      <div>
+        <div class="sec-head-title">GIÁ ĐIỆN EVN 2026 — CÀNG DÙNG NHIỀU CÀNG ĐẮT</div>
+        <div class="sec-head-sub">Biểu giá 5 bậc theo QĐ 14/2025/QĐ-TTg · chưa gồm VAT 8%</div>
+      </div>
+    </div>
+    <div class="sec-body">
+      <table class="evn-table">
+        <tr><th>Bậc tiêu thụ</th><th style="text-align:right">Giá (đ/kWh)</th></tr>
+        <tr><td>Bậc 1 · 0 – 100 kWh</td><td class="pr">1.984</td></tr>
+        <tr><td>Bậc 2 · 101 – 200 kWh</td><td class="pr">2.380</td></tr>
+        <tr><td>Bậc 3 · 201 – 400 kWh</td><td class="pr">2.998</td></tr>
+        <tr class="hot"><td>Bậc 4 · 401 – 700 kWh</td><td class="pr">3.571</td></tr>
+        <tr class="hot"><td>Bậc 5 · từ 701 kWh ⚠️</td><td class="pr">3.967</td></tr>
+      </table>
+      <div class="evn-note">Điện mặt trời cắt đúng phần điện <b>bậc cao nhất</b> trong hóa đơn của bạn — mỗi kWh tự sản xuất là một kWh giá đắt nhất không phải trả EVN.</div>
+      <div class="peak-box">
+        <div class="pb-title">🕠 Khung giờ cao điểm MỚI từ 22/4/2026 (QĐ 963/QĐ-BCT)</div>
+        Thứ 2 – Thứ 7: <strong>17h30 – 22h30</strong> mỗi ngày · Chủ nhật không có giờ cao điểm.<br>
+        Đúng khung giờ này <strong>mặt trời đã tắt</strong> — chỉ hệ có <b>PIN LƯU TRỮ</b> mới phát điện thay lưới, hộ kinh doanh áp giá cao điểm tiết kiệm mạnh nhất ở đây.
+      </div>
+    </div>
+  </div>
+
+  <!-- TRẢ GÓP -->
+  <div class="sec-card" id="tragop">
+    <div class="sec-head">
+      <div class="sec-head-icon">🏦</div>
+      <div>
+        <div class="sec-head-title">TRẢ GÓP HÀNG THÁNG — VAY TỐI ĐA 100 TRIỆU</div>
+        <div class="sec-head-sub">Lắp ngay hôm nay, trả dần nhẹ nhàng — tiền điện tiết kiệm gánh hộ tiền góp</div>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tg-pick">
+        <button class="tg-amt active" id="amt80" onclick="setTgAmt(80)">
+          <div class="ta-num">80 triệu</div>
+          <div class="ta-sub">Gói vay 80.000.000đ</div>
+        </button>
+        <button class="tg-amt" id="amt100" onclick="setTgAmt(100)">
+          <div class="ta-num">100 triệu</div>
+          <div class="ta-sub">Gói vay tối đa</div>
+        </button>
+      </div>
+      <div class="tg-months" id="tgMonths">
+        <button class="tg-m" onclick="setTgM(15, this)">15<small>tháng</small></button>
+        <button class="tg-m" onclick="setTgM(18, this)">18<small>tháng</small></button>
+        <button class="tg-m active" onclick="setTgM(24, this)">24<small>tháng</small></button>
+        <button class="tg-m" onclick="setTgM(36, this)">36<small>tháng</small></button>
+        <button class="tg-m" onclick="setTgM(48, this)">48<small>tháng</small></button>
+      </div>
+      <div class="tg-result">
+        <div class="tg-r-label">Chia đều hàng tháng chỉ</div>
+        <div class="tg-r-num" id="tgMonthly">3.800.000đ</div>
+        <div class="tg-r-sub" id="tgSub">Gói 80 triệu · 24 tháng</div>
+        <div class="tg-detail">
+          <div class="tg-d">
+            <div class="tg-d-label">Tổng lãi</div>
+            <div class="tg-d-val" id="tgInterest">—</div>
+          </div>
+          <div class="tg-d">
+            <div class="tg-d-label">Tổng phải trả</div>
+            <div class="tg-d-val" id="tgTotal">—</div>
+          </div>
+          <div class="tg-d">
+            <div class="tg-d-label">Số kỳ trả</div>
+            <div class="tg-d-val" id="tgTerm">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="tg-note">💡 Mẹo: với hệ có lưu trữ phù hợp, tiền điện tiết kiệm mỗi tháng thường <b>đủ bù phần lớn tiền góp</b> — lắp solar gần như không đổi chi phí sống hàng tháng. Hồ sơ vay đơn giản, Lộc Linh hỗ trợ trọn thủ tục.</div>
+    </div>
+  </div>
+
+  <!-- TƯ VẤN BÁO GIÁ -->
+  <div class="sec-card" id="tuvan">
+    <div class="sec-head goldhead">
+      <div class="sec-head-icon">📝</div>
+      <div>
+        <div class="sec-head-title">NHẬN TƯ VẤN &amp; BÁO GIÁ CHI TIẾT</div>
+        <div class="sec-head-sub">Kỹ sư khảo sát tận mái — báo giá đúng nhu cầu nhà bạn</div>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="advise-grid">
+        <a href="https://loclinhsolar.github.io/form/" class="cta-form" target="_blank" rel="noopener">📋 ĐĂNG KÝ TƯ VẤN BÁO GIÁ</a>
+        <a href="https://loclinhsolar.github.io/catalogue/" class="cta-cat" target="_blank" rel="noopener">📖 XEM CATALOGUE SẢN PHẨM</a>
+      </div>
+      <div class="advise-grid" style="margin-top:10px">
+        <a href="tel:0817345555" class="cta-call">📞 0817.345.555</a>
+        <a href="https://zalo.me/0817345555" class="cta-zalo">💬 Chat Zalo</a>
+      </div>
+      <div class="advise-note">Điền form 1 phút → đội ngũ Lộc Linh gọi lại trong ngày · Khảo sát miễn phí tại Quỳnh Lưu &amp; toàn Nghệ An</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <strong>Lộc Linh Solar</strong> · TT. Cầu Giát - Quỳnh Lưu - Nghệ An · 0817.345.555<br>
+  Chuyên nghiệp – Uy tín – Bền vững · loclinhsolar.vn
+</footer>
+
+<script>
+// ── BIỂU GIÁ ĐIỆN SINH HOẠT 2026 (QĐ 14/2025/QĐ-TTg) ──
+// 5 bậc, đơn giá chưa VAT — nhân VAT 8% khi tính hóa đơn
+const VAT = 1.08;
+const TIERS = [
+  { upto: 100,      price: 1983.66 },
+  { upto: 200,      price: 2380.39 },
+  { upto: 400,      price: 2997.53 },
+  { upto: 700,      price: 3570.59 },
+  { upto: Infinity, price: 3967.32 }
+];
+const KWH_PER_KWP   = 110;        // Sản lượng Nghệ An ~110 kWh/kWp/tháng
+const LIFE_YEARS    = 25;
+const STD_SIZES     = [3,5,6,8,10,12,15,20,25,30];
+const PRICE_PER_KWP = 13200000;   // Giá trọn gói/kWp (combo 11,52kWp + pin 16kWh ~152tr → ~13,2tr/kWp)
+const SIZING_COVER  = 0.80;       // Chọn công suất để phủ ~80% lượng điện
+const OFFSET_RATE   = 0.72;       // Thực tế cắt được ~72% điện lưới (đã trừ lệch giờ, ngày mây, hao pin)
+const ELEC_GROWTH   = 0.045;      // Giá điện +5%/năm, trừ suy hao tấm pin 0,5% → tiết kiệm tăng ~4,5%/năm
+
+// Tiền điện (đã VAT) cho lượng kWh
+function costOf(kwh) {
+  let cost = 0, prev = 0;
+  for (const t of TIERS) {
+    if (kwh <= prev) break;
+    const inTier = Math.min(kwh, t.upto) - prev;
+    cost += inTier * t.price;
+    prev = t.upto;
+  }
+  return cost * VAT;
+}
+
+// Tính ngược: hóa đơn → kWh (nhị phân)
+function billToKwh(bill) {
+  let lo = 0, hi = 20000;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (costOf(mid) < bill) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+function fmt(n) {
+  if (n >= 1e9) return (n/1e9).toFixed(2).replace('.', ',') + ' tỷ';
+  if (n >= 1e6) return (n/1e6).toFixed(1).replace('.', ',') + ' triệu';
+  if (n >= 1e3) return Math.round(n/1e3) + 'k';
+  return n.toLocaleString('vi-VN');
+}
+function fmtFull(n) { return n.toLocaleString('vi-VN') + 'đ'; }
+
+let calcTimer;
+function onInput() {
+  clearTimeout(calcTimer);
+  document.querySelectorAll('.qbtn').forEach(b => b.classList.remove('active'));
+  calcTimer = setTimeout(calculate, 600);
+}
+function setAmount(val, btn) {
+  document.getElementById('billInput').value = val;
+  document.querySelectorAll('.qbtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  calculate();
+}
+
+function calculate() {
+  const bill = parseFloat(document.getElementById('billInput').value);
+  const card = document.getElementById('resultCard');
+  if (!bill || bill < 100000) { card.classList.remove('show'); return; }
+
+  // 1. Hóa đơn → kWh theo biểu giá 5 bậc 2026 + VAT
+  const totalKwh = billToKwh(bill);
+
+  // 2. Công suất đề xuất: phủ ~80% lượng điện, làm tròn lên cỡ chuẩn
+  const rawPower = (totalKwh * SIZING_COVER) / KWH_PER_KWP;
+  const power    = STD_SIZES.find(s => s >= rawPower) || 30;
+
+  // 3. Lượng điện thực tế cắt được — cắt từ bậc đắt nhất xuống
+  const kwhOffset   = totalKwh * OFFSET_RATE;
+  const remainBill  = costOf(totalKwh - kwhOffset);
+  const monthlySave = Math.round(bill - remainBill);
+  const saveRate    = monthlySave / bill;     // % tiền > % điện vì cắt bậc đắt trước
+  const yearlySave  = monthlySave * 12;
+
+  // 4. Chi phí từ giá combo thật → hoàn vốn tính xuôi
+  const totalCost   = power * PRICE_PER_KWP;
+  const payback     = totalCost / yearlySave;     // năm; thận trọng, chưa tính giá điện tăng
+
+  // 5. Lợi nhuận 25 năm: tiết kiệm tăng ~4,5%/năm (giá điện lên, trừ suy hao tấm pin)
+  let cumSave = 0, yr = yearlySave;
+  for (let y = 1; y <= LIFE_YEARS; y++) { cumSave += yr; yr *= (1 + ELEC_GROWTH); }
+  const profit25    = Math.round(cumSave - totalCost);
+
+  const currentYear = new Date().getFullYear();
+  const paybackYear = currentYear + Math.ceil(payback);
+  const freeEndYear = currentYear + LIFE_YEARS;
+  const freeYears   = Math.max(0, LIFE_YEARS - Math.ceil(payback));
+  const paybackTxt  = (Math.round(payback * 10) / 10).toString().replace('.', ',');
+
+  document.getElementById('rBillLabel').textContent      = 'Hóa đơn: ' + fmtFull(bill) + '/tháng';
+  document.getElementById('rMonthlySave').textContent    = fmt(monthlySave) + 'đ';
+  document.getElementById('rMonthlySaveSub').textContent = '= ' + Math.round(saveRate*100) + '% hóa đơn (cắt điện bậc 3–5 giá cao trước)';
+  document.getElementById('rKwh').textContent            = Math.round(totalKwh).toLocaleString('vi-VN');
+  document.getElementById('rPower').textContent          = power;
+  document.getElementById('rYearly').textContent         = fmt(yearlySave);
+  document.getElementById('rYearlySub').textContent      = '= ' + fmtFull(yearlySave) + '/năm';
+  document.getElementById('rProfit').textContent         = fmt(profit25);
+  document.getElementById('rProfitSub').textContent      = 'ước tính 25 năm (giá điện +5%/năm)';
+  document.getElementById('barPct').textContent          = 'Tiết kiệm ' + Math.round(saveRate*100) + '%';
+
+  document.getElementById('tlPayback').innerHTML =
+    'Năm <strong>' + paybackYear + '</strong>: Hoàn vốn (~' + paybackTxt + ' năm) — bắt đầu lãi';
+  document.getElementById('tlFree').innerHTML =
+    'Từ <strong>' + paybackYear + '</strong> đến <strong>' + freeEndYear + '</strong>: Điện gần như <strong>MIỄN PHÍ ' + freeYears + ' năm</strong> 🎉';
+
+  card.classList.remove('show');
+  void card.offsetWidth;
+  card.classList.add('show');
+  document.getElementById('barFill').style.width = '0%';
+  setTimeout(() => { document.getElementById('barFill').style.width = (saveRate * 100) + '%'; }, 200);
+  setTimeout(() => { card.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
+}
+
+// ── TRẢ GÓP — số liệu chính thức Lộc Linh (tối đa 100 triệu) ──
+// [tổng lãi, góp hàng tháng] theo kỳ hạn
+const INSTALL = {
+  80: {
+    15: [7045000, 5803000],   18: [8416000, 4912000],
+    24: [11200000, 3800000],  36: [16912000, 2692000],
+    48: [22864000, 2143000]
+  },
+  100: {
+    15: [8825000, 7255000],   18: [10538000, 6141000],
+    24: [14216000, 4759000],  36: [21104000, 3364000],
+    48: [28544000, 2678000]
+  }
+};
+let tgAmt = 80, tgM = 24;
+
+function setTgAmt(a) {
+  tgAmt = a;
+  document.getElementById('amt80').classList.toggle('active', a === 80);
+  document.getElementById('amt100').classList.toggle('active', a === 100);
+  renderTg();
+}
+function setTgM(m, btn) {
+  tgM = m;
+  document.querySelectorAll('.tg-m').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTg();
+}
+function renderTg() {
+  const [interest, monthly] = INSTALL[tgAmt][tgM];
+  const principal = tgAmt * 1000000;
+  document.getElementById('tgMonthly').textContent  = fmtFull(monthly);
+  document.getElementById('tgSub').textContent      = 'Gói ' + tgAmt + ' triệu · ' + tgM + ' tháng';
+  document.getElementById('tgInterest').textContent = fmt(interest);
+  document.getElementById('tgTotal').textContent    = fmt(principal + interest);
+  document.getElementById('tgTerm').textContent     = tgM + ' kỳ';
+}
+
+// ── ĐIỀU HƯỚNG + SCROLLSPY ──
+function gotoSec(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function setActiveChip(id) {
+  document.querySelectorAll('.nav-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.target === id);
+  });
+}
+(function initSpy() {
+  const ids = ['calc','evn','tragop','tuvan'];
+  if (!('IntersectionObserver' in window)) return;
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) setActiveChip(e.target.id); });
+  }, { rootMargin:'-30% 0px -55% 0px' });
+  ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
+})();
+renderTg();
+</script>
+</body>
+</html>
