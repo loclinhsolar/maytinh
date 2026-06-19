@@ -716,5 +716,459 @@ function setActiveChip(id) {
 })();
 renderTg();
 </script>
+<!-- LOC LINH AI WIDGET START -->
+<style>
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ══════════════════════════════
+   FAB BUTTON
+══════════════════════════════ */
+#ll-fab {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: linear-gradient(135deg, #0F6B3A, #14A44D);
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(15,107,58,0.45);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s;
+}
+#ll-fab:hover { transform: scale(1.08); }
+#ll-fab svg { width: 28px; height: 28px; fill: #fff; }
+#ll-badge {
+  position: absolute; top: -2px; right: -2px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #E2B23B; color: #1a1a1a;
+  font-size: 10px; font-weight: 800;
+  display: none; align-items: center; justify-content: center;
+}
+
+/* ══════════════════════════════
+   CHAT PANEL
+══════════════════════════════ */
+#ll-panel {
+  position: fixed; bottom: 96px; right: 24px; z-index: 9998;
+  width: 360px; max-height: 560px;
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: opacity 0.25s, transform 0.25s;
+  opacity: 0; transform: translateY(16px) scale(0.97);
+  pointer-events: none;
+}
+#ll-panel.open {
+  opacity: 1; transform: translateY(0) scale(1);
+  pointer-events: all;
+}
+
+/* Header */
+#ll-header {
+  background: linear-gradient(135deg, #0F6B3A, #14A44D);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0;
+}
+#ll-avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.5);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+#ll-header-info { flex: 1; min-width: 0; }
+#ll-header-info h3 { color: #fff; font-size: 14px; font-weight: 700; }
+#ll-header-info p  { color: rgba(255,255,255,0.8); font-size: 11px; margin-top: 2px; }
+#ll-close-btn {
+  background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,0.8); font-size: 22px; line-height: 1;
+  padding: 4px; flex-shrink: 0;
+}
+#ll-close-btn:hover { color: #fff; }
+
+/* Dot status */
+#ll-status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #4ade80; display: inline-block;
+  margin-right: 4px; vertical-align: middle;
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+}
+
+/* Messages */
+#ll-messages {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  scroll-behavior: smooth;
+}
+#ll-messages::-webkit-scrollbar { width: 4px; }
+#ll-messages::-webkit-scrollbar-thumb { background: #cde8d6; border-radius: 4px; }
+
+.msg { display: flex; gap: 8px; align-items: flex-end; }
+.msg.bot  { align-self: flex-start; max-width: 88%; }
+.msg.user { align-self: flex-end;   max-width: 88%; flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #0F6B3A, #14A44D);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.msg-bubble {
+  padding: 10px 13px; border-radius: 16px;
+  font-size: 13.5px; line-height: 1.55; word-break: break-word;
+}
+.msg.bot  .msg-bubble { background: #f0f7f2; color: #1a2e1e; border-bottom-left-radius: 4px; }
+.msg.user .msg-bubble { background: linear-gradient(135deg,#0F6B3A,#14A44D); color:#fff; border-bottom-right-radius:4px; }
+.msg-bubble strong { font-weight: 700; }
+.msg-bubble a { color: #0F6B3A; font-weight: 600; text-decoration: underline; }
+.msg.user .msg-bubble a { color: #E2B23B; }
+
+/* typing */
+.typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 2px; }
+.typing-dots span {
+  width: 7px; height: 7px; border-radius: 50%; background: #14A44D;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+/* quick replies */
+#ll-quick { padding: 6px 16px 10px; display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
+.qr-btn {
+  background: #f0f7f2; border: 1.5px solid #14A44D;
+  color: #0F6B3A; border-radius: 100px;
+  padding: 6px 13px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s; white-space: nowrap; font-family: inherit;
+}
+.qr-btn:hover { background: #14A44D; color: #fff; }
+
+/* input */
+#ll-input-area {
+  padding: 10px 12px 12px; display: flex; gap: 8px; align-items: flex-end;
+  border-top: 1px solid #e8f3ec; flex-shrink: 0; background: #fff;
+}
+#ll-textarea {
+  flex: 1; resize: none; border: 1.5px solid #cde8d6; border-radius: 12px;
+  padding: 9px 12px; font-size: 13.5px; font-family: inherit; line-height: 1.4;
+  color: #1a2e1e; outline: none; max-height: 90px; transition: border-color .2s;
+}
+#ll-textarea:focus { border-color: #14A44D; }
+#ll-textarea::placeholder { color: #a0c0a8; }
+#ll-send {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg,#0F6B3A,#14A44D);
+  border: none; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .15s, opacity .15s;
+}
+#ll-send:hover { transform: scale(1.08); }
+#ll-send:disabled { opacity: .45; cursor: default; transform: none; }
+#ll-send svg { width: 18px; height: 18px; fill: #fff; }
+
+#ll-footer { text-align: center; font-size: 10px; color: #aaa; padding: 4px 0 8px; flex-shrink: 0; }
+
+/* mobile */
+@media (max-width: 420px) {
+  #ll-panel { width: calc(100vw - 24px); right: 12px; bottom: 82px; }
+  #ll-fab   { right: 12px; bottom: 12px; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════
+     CẤU HÌNH – CHỈ SỬA 1 DÒNG NÀY
+════════════════════════════════════════ -->
+<script>
+  // ⬇️ Thay bằng URL Worker của bạn sau khi deploy
+  const WORKER_URL = 'https://loclinh-agent.pandapop174.workers.dev/';
+</script>
+
+<!-- FAB -->
+<button id="ll-fab" onclick="llToggle()" title="Chat với Trợ lý Lộc Linh">
+  <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+  <span id="ll-badge">1</span>
+</button>
+
+<!-- PANEL -->
+<div id="ll-panel">
+  <div id="ll-header">
+    <div id="ll-avatar">☀️</div>
+    <div id="ll-header-info">
+      <h3>Trợ lý Lộc Linh</h3>
+      <p><span id="ll-status-dot"></span>Tư vấn điện mặt trời · Nghệ An</p>
+    </div>
+    <button id="ll-close-btn" onclick="llToggle()">×</button>
+  </div>
+  <div id="ll-messages"></div>
+  <div id="ll-quick"></div>
+  <div id="ll-input-area">
+    <textarea id="ll-textarea" rows="1"
+      placeholder="Hỏi về điện mặt trời…"
+      onkeydown="llKeydown(event)"
+      oninput="llAutoResize(this)"></textarea>
+    <button id="ll-send" onclick="llSend()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+  <div id="ll-footer">Powered by Claude AI · Lộc Linh Solar</div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   SYSTEM PROMPT
+══════════════════════════════════════════════════ */
+const SYSTEM_PROMPT = `Bạn là **Trợ lý Lộc Linh** – trợ lý tư vấn điện mặt trời của **Lộc Linh Solar**, công ty phân phối và lắp đặt điện mặt trời tại Nghệ An (TT. Cầu Giát, Quỳnh Lưu).
+
+## GIỌNG ĐIỆU
+- Thân thiện, gần gũi, mang chất miền Trung: xưng "anh/chị" và "em"
+- Ngắn gọn, đi thẳng vào vấn đề
+- Nhiệt tình, tạo niềm tin
+
+## NHIỆM VỤ
+✅ Giải thích điện mặt trời hoạt động như thế nào
+✅ Tính ước lượng tiết kiệm điện theo hóa đơn khách cung cấp
+✅ Gợi ý công suất hệ thống phù hợp (kWp)
+✅ Tư vấn sản phẩm Tier 1 (SolaX Cao Cấp), Tier 2 (GoodWe Cao Cấp), Tier 3 (Trung Cấp)
+✅ So sánh SolaX vs GoodWe, bảo hành, quy trình lắp đặt
+✅ Trả lời FAQ: mất điện có dùng được không, lắp mấy ngày, trả góp, khu vực
+✅ Kể về công trình thực tế Lộc Linh tại Nghệ An
+✅ Hướng dẫn khách đến đúng trang
+
+❌ KHÔNG báo giá cụ thể – luôn mời khách để lại thông tin
+❌ KHÔNG tư vấn Tier 4 (LuxPower) & Tier 5 (SVE) qua chat – mời liên hệ trực tiếp
+
+## SẢN PHẨM
+
+### TIER 1 – CAO CẤP (SolaX + Pin TSYS)
+- X1-LITE-LV: 1 pha, 1–6 kW, hiệu suất 97.7%, UPS <20ms, IP65
+- X1-RENO-LV: 1 pha, 3–6 kW, màn hình LCD + WiFi/APP, IP65
+- X1-Hybrid LV: 1 pha, 3.7–6 kW, kết nối pin LV, IP65
+- X3-NEO-LV: 3 pha, 5–15 kW, kết nối song song tối đa 4 máy, IP65
+Pin TSYS: LFP 48V low voltage, ≥6.000 chu kỳ
+
+### TIER 2 – CAO CẤP (GoodWe + Pin Lynx A G4)
+- GW8000-ES-C10: 1 pha, 8/10/12 kW, hiệu suất 97.6%, UPS <4ms, IP66, song song 6 máy
+- ET-LV: 3 pha, 5–20 kW, PV tối đa 40kWp, hiệu suất 97.8%, UPS <4ms, IP66 C4
+Pin Lynx A G4: 16.1 kWh, LFP, DoD 100%, IP55
+
+### TIER 3 – TRUNG CẤP (GoodWe/SolaX + Dyness/Vanyo)
+Pin Dyness PowerBrick: 16.07 kWh, LFP, ≥8.000 chu kỳ, DoD 95%
+Pin Vanyo WY48-314-2: 15.07 kWh, LFP, 6.000 chu kỳ, 15 năm tuổi thọ
+
+### TIER 4 & 5 – KHÔNG TƯ VẤN QUA CHAT
+LuxPower & SVE: "Dòng này cần trao đổi trực tiếp với tư vấn viên. Em hỗ trợ anh/chị điền form hoặc gọi 0817.345.555 nhé!"
+
+## TÍNH TIẾT KIỆM ĐIỆN
+- kWh/tháng ≈ hóa đơn (VNĐ) / 3.000
+- 1 kWp → ~100–120 kWh/tháng tại Nghệ An
+- Công suất cần ≈ kWh / 110
+- Tiết kiệm 60–80% tùy có pin hay không
+- Hoàn vốn: 4–6 năm (không pin), 6–8 năm (có pin)
+
+## QUY TRÌNH
+1. Khảo sát miễn phí (24h sau đăng ký)
+2. Báo giá miễn phí, chi tiết
+3. Ký HĐ, cọc 30%
+4. Thi công 1–2 ngày (HGĐ), 3–5 ngày (công trình lớn)
+5. Nghiệm thu, bàn giao, hướng dẫn APP
+6. Hỗ trợ kỹ thuật 24/7
+
+## BẢO HÀNH
+- Tấm pin: 25 năm hiệu suất, 12 năm sản phẩm
+- Biến tần SolaX/GoodWe: 5–10 năm
+- Pin lưu trữ: 5–10 năm
+- Thi công: 5 năm
+
+## HỖ TRỢ TÀI CHÍNH
+- Vay ngân hàng tới 100.000.000đ
+- Trả góp 0% qua ngân hàng liên kết
+
+## KHU VỰC
+Toàn tỉnh Nghệ An: Quỳnh Lưu, Diễn Châu, Yên Thành, Nghi Lộc, Hưng Nguyên, Đô Lương, Thanh Chương, Nam Đàn, Tân Kỳ, Nghĩa Đàn, Thái Hòa, TP. Vinh và các huyện khác.
+
+## LIÊN HỆ & TRANG WEB
+- Hotline/Zalo: **0817.345.555**
+- Địa chỉ: TT. Cầu Giát, Quỳnh Lưu, Nghệ An
+- Máy tính điện: loclinhsolar.github.io/maytinhtiendien/
+- Catalogue: loclinhsolar.github.io/catalogue/
+- Công trình: loclinhsolar.github.io/congtrinh/
+- Đăng ký tư vấn: loclinhsolar.github.io/form/
+
+## QUY TẮC BÁO GIÁ
+Khi hỏi giá: "Giá phụ thuộc công suất, thiết bị và điều kiện mái nhà. Anh/chị **để lại thông tin tại đây** hoặc gọi **0817.345.555** – tư vấn viên sẽ liên hệ trong 30 phút!"
+
+Dùng Markdown nhẹ. Ưu tiên ngắn gọn, đủ ý.`;
+
+/* ══════════════════════════════
+   STATE
+══════════════════════════════ */
+let isOpen   = false;
+let isTyping = false;
+let history  = [];
+
+const QUICK_INIT = [
+  'Hóa đơn 2 triệu, lắp bao nhiêu kWp?',
+  'SolaX và GoodWe khác nhau gì?',
+  'Bảo hành bao lâu?',
+  'Có trả góp không?',
+];
+
+/* ══════════════════════════════
+   TOGGLE
+══════════════════════════════ */
+function llToggle() {
+  isOpen = !isOpen;
+  document.getElementById('ll-panel').classList.toggle('open', isOpen);
+  document.getElementById('ll-badge').style.display = 'none';
+  if (isOpen && history.length === 0) llGreet();
+}
+
+/* ══════════════════════════════
+   GREETING
+══════════════════════════════ */
+function llGreet() {
+  const g = "Chào anh/chị! Em là **Trợ lý Lộc Linh** ☀️\n\nEm có thể giúp anh/chị:\n- Tính tiết kiệm điện theo hóa đơn\n- Tư vấn hệ thống phù hợp\n- So sánh SolaX vs GoodWe\n- Giải đáp mọi câu hỏi về lắp đặt điện mặt trời tại Nghệ An\n\nAnh/chị cần hỗ trợ gì ạ?";
+  appendMsg('bot', g);
+  showQR(QUICK_INIT);
+}
+
+/* ══════════════════════════════
+   APPEND
+══════════════════════════════ */
+function appendMsg(role, text) {
+  const wrap = document.getElementById('ll-messages');
+  const div  = document.createElement('div');
+  div.className = 'msg ' + role;
+  if (role === 'bot') {
+    div.innerHTML = `<div class="msg-avatar">☀️</div><div class="msg-bubble">${md(text)}</div>`;
+  } else {
+    div.innerHTML = `<div class="msg-bubble">${esc(text)}</div>`;
+  }
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+/* ══════════════════════════════
+   TYPING
+══════════════════════════════ */
+let _typingEl = null;
+function showTyping() {
+  const wrap = document.getElementById('ll-messages');
+  _typingEl = document.createElement('div');
+  _typingEl.className = 'msg bot';
+  _typingEl.innerHTML = `<div class="msg-avatar">☀️</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  wrap.appendChild(_typingEl);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+function hideTyping() { if (_typingEl) { _typingEl.remove(); _typingEl = null; } }
+
+/* ══════════════════════════════
+   QUICK REPLIES
+══════════════════════════════ */
+function showQR(arr) {
+  const wrap = document.getElementById('ll-quick');
+  wrap.innerHTML = '';
+  arr.forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'qr-btn'; b.textContent = q;
+    b.onclick = () => { clearQR(); llSendText(q); };
+    wrap.appendChild(b);
+  });
+}
+function clearQR() { document.getElementById('ll-quick').innerHTML = ''; }
+
+/* ══════════════════════════════
+   SEND
+══════════════════════════════ */
+function llSend() {
+  const ta  = document.getElementById('ll-textarea');
+  const txt = ta.value.trim();
+  if (!txt || isTyping) return;
+  ta.value = ''; ta.style.height = '';
+  clearQR();
+  llSendText(txt);
+}
+
+async function llSendText(text) {
+  if (isTyping) return;
+  isTyping = true;
+  appendMsg('user', text);
+  history.push({ role: 'user', content: text });
+  document.getElementById('ll-send').disabled = true;
+  showTyping();
+
+  try {
+    // Gọi Cloudflare Worker (không lộ API key)
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:      'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system:     SYSTEM_PROMPT,
+        messages:   history,
+      }),
+    });
+
+    const data  = await res.json();
+    const reply = data?.content?.[0]?.text
+      || 'Xin lỗi anh/chị, em gặp sự cố kỹ thuật. Vui lòng thử lại hoặc gọi **0817.345.555** ạ!';
+
+    hideTyping();
+    appendMsg('bot', reply);
+    history.push({ role: 'assistant', content: reply });
+
+    const fu = followUp(text, reply);
+    if (fu.length) showQR(fu);
+
+  } catch (e) {
+    hideTyping();
+    appendMsg('bot', '⚠️ Không kết nối được. Anh/chị vui lòng gọi **0817.345.555** nhé!');
+  }
+
+  isTyping = false;
+  document.getElementById('ll-send').disabled = false;
+}
+
+/* gợi ý follow-up */
+function followUp(userText, botReply) {
+  const t = (userText + botReply).toLowerCase();
+  if (t.includes('giá') || t.includes('báo giá') || t.includes('chi phí'))
+    return ['Điền form nhận báo giá miễn phí', 'Gọi 0817.345.555'];
+  if (t.includes('kwp') || t.includes('công suất'))
+    return ['Xem catalogue sản phẩm', 'Quy trình lắp đặt thế nào?'];
+  if (t.includes('solax') || t.includes('goodwe') || t.includes('dyness'))
+    return ['Dòng nào phù hợp nhất với tôi?', 'Bảo hành ra sao?'];
+  if (t.includes('bảo hành') || t.includes('lắp đặt'))
+    return ['Khu vực nào được phục vụ?', 'Tính tiết kiệm điện cho tôi'];
+  if (t.includes('hoàn vốn') || t.includes('tiết kiệm'))
+    return ['Xem công trình thực tế', 'Đăng ký khảo sát miễn phí'];
+  return [];
+}
+
+/* ══════════════════════════════
+   HELPERS
+══════════════════════════════ */
+function llKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); llSend(); }
+}
+function llAutoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 90) + 'px';
+}
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function md(s) {
+  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+</script>
+<!-- LOC LINH AI WIDGET END -->
 </body>
 </html>
