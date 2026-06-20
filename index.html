@@ -1252,9 +1252,9 @@ const PAGE_CONTEXT = 'maytinh';
     <div id="ll-form-success">
       <div class="suc-icon">✅</div>
       <div class="suc-title">Đã ghi nhận!</div>
-      <div class="suc-sub">Tư vấn viên Lộc Linh sẽ gọi lại trong vòng <strong>30 phút</strong> ạ!</div>
+      <div class="suc-sub">Tư vấn viên Lộc Linh sẽ gọi lại trong vòng <strong>30 phút đến 24 tiếng</strong> ạ!</div>
       <div class="suc-card" id="ll-suc-info"></div>
-      <div class="suc-badge">⚠️ GỌI LẠI TRONG 30 PHÚT!</div>
+      <div class="suc-badge">⏰ GỌI LẠI TRONG 30 PHÚT – 24 TIẾNG!</div>
       <button class="suc-back" onclick="llCloseForm()">← Quay lại chat</button>
     </div>
 
@@ -1273,7 +1273,7 @@ const PAGE_CONTEXT = 'maytinh';
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-let isOpen=false, busy=false, history=[];
+let isOpen=false, busy=false, history=[], leadSubmitted=false;
 let formStep=1, formAns={};
 const TOTAL_STEPS=6;
 
@@ -1458,6 +1458,11 @@ function getFollowUp(u,b) {
    FORM MINI
 ═══════════════════════════════════════ */
 function llOpenForm() {
+  // Nếu đã submit rồi → hiện banner thay vì mở form lại
+  if (leadSubmitted) {
+    llShowAlreadySubmitted();
+    return;
+  }
   // Reset form về bước 1
   formStep=1; formAns={};
   document.querySelectorAll('.ll-step').forEach(s=>s.classList.remove('active'));
@@ -1479,6 +1484,11 @@ function llOpenForm() {
   document.getElementById('ll-header-sub').textContent='Đặt lịch khảo sát miễn phí';
 
   document.getElementById('ll-form-view').classList.add('show');
+}
+
+function llShowAlreadySubmitted() {
+  // Hiện tin nhắn trong chat thay vì mở form
+  addMsg('bot', '✅ Anh/chị đã đăng ký rồi! Tư vấn viên Lộc Linh đang xử lý và sẽ gọi lại trong **30 phút đến 24 tiếng** ạ. Anh/chị có câu hỏi gì thêm không?');
 }
 
 function llCloseForm() {
@@ -1633,6 +1643,8 @@ async function llFormSubmit() {
 
   document.getElementById('ll-form-success').classList.add('show');
 
+  // Đánh dấu đã submit lead
+  leadSubmitted = true;
   // Gửi tin nhắn xác nhận vào chat
   addMsg('bot',`✅ Em đã đặt lịch cho anh/chị rồi! Tư vấn viên Lộc Linh sẽ gọi lại${data.name?' cho **'+data.name+'**':''} trong vòng **30 phút** ạ! Anh/chị có câu hỏi gì thêm không?`);
 }
