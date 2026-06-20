@@ -664,7 +664,6 @@ function calculate() {
     saveRate:    Math.round(saveRate * 100),
     power:       power,
     paybackTxt:  paybackTxt,
-    totalCost:   totalCost,
   });
 }
 
@@ -1346,7 +1345,7 @@ function llBridgeCalcResult(r) {
   const costFmt  = Math.round(r.totalCost / 1000000);
 
   // Cập nhật pageMeta – worker sẽ nhận được trong mỗi lần gọi tiếp theo
-  pageMeta = `[Kết quả máy tính khách vừa xem] Hóa đơn: ${Math.round(r.bill/1000)*1000}đ/tháng | Tiết kiệm dự kiến: ${saveFmt}đ/tháng (${r.saveRate}%) | Công suất đề xuất: ${r.power}kWp | Chi phí ước tính: ${costFmt} triệu | Hoàn vốn: ~${r.paybackTxt} năm. Khách đã thấy kết quả này, KHÔNG hỏi lại hóa đơn.`;
+  pageMeta = `[Kết quả máy tính khách vừa xem] Hóa đơn: ${Math.round(r.bill/1000)*1000}đ/tháng | Tiết kiệm dự kiến: ${saveFmt}đ/tháng (${r.saveRate}%) | Công suất đề xuất: ${r.power}kWp | Hoàn vốn: ~${r.paybackTxt} năm. Khách đã thấy kết quả này, KHÔNG hỏi lại hóa đơn. KHÔNG báo giá chi phí cụ thể – giá phụ thuộc thực tế, phải khảo sát.`;
 
   // Nếu chat chưa mở → mở và greet bằng kết quả thật
   if (!isOpen) {
@@ -1357,7 +1356,7 @@ function llBridgeCalcResult(r) {
     // Greeting thông minh dựa vào số thật
     const msg = `Em vừa tính xong cho anh/chị rồi ạ! 🌞\n\n`
       + `**Tiết kiệm dự kiến: ${saveFmt}đ/tháng** (${r.saveRate}% hóa đơn)\n`
-      + `Hệ phù hợp: **${r.power}kWp** · Chi phí ~${costFmt} triệu · Hoàn vốn ~${r.paybackTxt} năm\n\n`
+      + `Hệ phù hợp: **${r.power}kWp** · Hoàn vốn ~${r.paybackTxt} năm\n\n`
       + `Anh/chị muốn em tư vấn cấu hình cụ thể (SolaX hay GoodWe) hay xem phương án trả góp không ạ?`;
     history = []; // reset history để context sạch
     addMsg('bot', msg);
@@ -1370,7 +1369,7 @@ function llBridgeCalcResult(r) {
   if (isOpen && history.length === 0) {
     const msg = `Em vừa tính xong cho anh/chị rồi ạ! 🌞\n\n`
       + `**Tiết kiệm dự kiến: ${saveFmt}đ/tháng** (${r.saveRate}% hóa đơn)\n`
-      + `Hệ phù hợp: **${r.power}kWp** · Chi phí ~${costFmt} triệu · Hoàn vốn ~${r.paybackTxt} năm\n\n`
+      + `Hệ phù hợp: **${r.power}kWp** · Hoàn vốn ~${r.paybackTxt} năm\n\n`
       + `Anh/chị muốn em tư vấn cấu hình cụ thể (SolaX hay GoodWe) hay xem phương án trả góp không ạ?`;
     addMsg('bot', msg);
     history.push({ role: 'assistant', content: msg });
