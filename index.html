@@ -656,6 +656,16 @@ function calculate() {
   document.getElementById('barFill').style.width = '0%';
   setTimeout(() => { document.getElementById('barFill').style.width = (saveRate * 100) + '%'; }, 200);
   setTimeout(() => { card.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
+
+  // ── CALCULATOR BRIDGE: inject kết quả vào chatbot ─────────
+  llBridgeCalcResult({
+    bill:        bill,
+    monthlySave: monthlySave,
+    saveRate:    Math.round(saveRate * 100),
+    power:       power,
+    paybackTxt:  paybackTxt,
+    totalCost:   totalCost,
+  });
 }
 
 // ── TRẢ GÓP — số liệu chính thức Lộc Linh (tối đa 100 triệu) ──
@@ -1275,6 +1285,7 @@ const PAGE_CONTEXT = 'maytinh';
 ═══════════════════════════════════════ */
 let isOpen=false, busy=false, history=[], leadSubmitted=false;
 let formStep=1, formAns={};
+let pageMeta = '';          // context động: kết quả máy tính, sản phẩm đang xem, v.v.
 const TOTAL_STEPS=6;
 
 const QR_INIT = [
@@ -1322,7 +1333,58 @@ function llToggle() {
 /* ═══════════════════════════════════════
    GREETING
 ═══════════════════════════════════════ */
-function llGreet() {
+/* ═══════════════════════════════════════
+   CALCULATOR BRIDGE
+   Gọi sau khi calculate() hiển thị kết quả.
+   – Cập nhật pageMeta để worker có ngữ cảnh thật
+   – Mở chat (nếu chưa mở) và inject greeting thông minh dựa trên số liệu thật
+   – Nếu chat đang mở và đã có hội thoại → chỉ cập nhật pageMeta, không greet lại
+═══════════════════════════════════════ */
+function llBridgeCalcResult(r) {
+  const billFmt  = Math.round(r.bill / 1000) * 1000;
+  const saveFmt  = r.monthlySave.toLocaleString('vi-VN');
+  const costFmt  = Math.round(r.totalCost / 1000000);
+
+  // Cập nhật pageMeta – worker sẽ nhận được trong mỗi lần gọi tiếp theo
+  pageMeta = `[Kết quả máy tính khách vừa xem] Hóa đơn: ${Math.round(r.bill/1000)*1000}đ/tháng | Tiết kiệm dự kiến: ${saveFmt}đ/tháng (${r.saveRate}%) | Công suất đề xuất: ${r.power}kWp | Chi phí ước tính: ${costFmt} triệu | Hoàn vốn: ~${r.paybackTxt} năm. Khách đã thấy kết quả này, KHÔNG hỏi lại hóa đơn.`;
+
+  // Nếu chat chưa mở → mở và greet bằng kết quả thật
+  if (!isOpen) {
+    isOpen = true;
+    document.getElementById('ll-panel').classList.add('open');
+    document.getElementById('ll-badge').style.display = 'none';
+    (function(){var b=document.getElementById("ll-bubble-hint");if(b){b.style.opacity="0";b.style.transform="translateY(8px)";b.style.pointerEvents="none";setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},250);}})();
+    // Greeting thông minh dựa vào số thật
+    const msg = `Em vừa tính xong cho anh/chị rồi ạ! 🌞\n\n`
+      + `**Tiết kiệm dự kiến: ${saveFmt}đ/tháng** (${r.saveRate}% hóa đơn)\n`
+      + `Hệ phù hợp: **${r.power}kWp** · Chi phí ~${costFmt} triệu · Hoàn vốn ~${r.paybackTxt} năm\n\n`
+      + `Anh/chị muốn em tư vấn cấu hình cụ thể (SolaX hay GoodWe) hay xem phương án trả góp không ạ?`;
+    history = []; // reset history để context sạch
+    addMsg('bot', msg);
+    history.push({ role: 'assistant', content: msg });
+    showQR(['Tư vấn cấu hình phù hợp', 'Xem trả góp', 'Khảo sát miễn phí']);
+    return;
+  }
+
+  // Nếu chat đang mở và chưa có hội thoại → greet luôn
+  if (isOpen && history.length === 0) {
+    const msg = `Em vừa tính xong cho anh/chị rồi ạ! 🌞\n\n`
+      + `**Tiết kiệm dự kiến: ${saveFmt}đ/tháng** (${r.saveRate}% hóa đơn)\n`
+      + `Hệ phù hợp: **${r.power}kWp** · Chi phí ~${costFmt} triệu · Hoàn vốn ~${r.paybackTxt} năm\n\n`
+      + `Anh/chị muốn em tư vấn cấu hình cụ thể (SolaX hay GoodWe) hay xem phương án trả góp không ạ?`;
+    addMsg('bot', msg);
+    history.push({ role: 'assistant', content: msg });
+    showQR(['Tư vấn cấu hình phù hợp', 'Xem trả góp', 'Khảo sát miễn phí']);
+    return;
+  }
+
+  // Chat đang mở và đã có hội thoại → inject nhẹ vào cuối, không interrupt
+  const note = `📊 *Anh/chị vừa tính lại: tiết kiệm ~${saveFmt}đ/tháng với hệ ${r.power}kWp. Em cập nhật để tư vấn đúng hơn nhé!*`;
+  addMsg('bot', note);
+  history.push({ role: 'assistant', content: note });
+}
+
+
   addMsg('bot','Chào anh/chị! Em là **Trợ lý Lộc Linh** ☀️\n\nAnh/chị đang đóng tiền điện khoảng bao nhiêu mỗi tháng ạ? Em tính tiết kiệm ngay cho anh/chị!');
   showQR(QR_INIT);
 }
@@ -1424,7 +1486,7 @@ async function llSendText(text) {
     const res=await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:history,page_context:PAGE_CONTEXT}),
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:history,page_context:PAGE_CONTEXT,page_meta:pageMeta||undefined}),
     });
     const data=await res.json();
     const reply=data?.content?.[0]?.text||'Xin lỗi anh/chị, em gặp sự cố. Vui lòng gọi **0817.345.555** ạ!';
