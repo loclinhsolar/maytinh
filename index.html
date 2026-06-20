@@ -551,7 +551,7 @@ const TIERS = [
 ];
 const KWH_PER_KWP   = 110;        // Sản lượng Nghệ An ~110 kWh/kWp/tháng
 const LIFE_YEARS    = 25;
-const STD_SIZES     = [3,5,6,8,10,12,15,20,25,30];
+const STD_SIZES     = [3,6,8,10,12,15,20,25,30];  // 5kWp bỏ → hóa đơn ~1.5tr ra 6kWp
 const PRICE_PER_KWP = 13200000;   // Giá trọn gói/kWp (combo 11,52kWp + pin 16kWh ~152tr → ~13,2tr/kWp)
 const SIZING_COVER  = 0.80;       // Chọn công suất để phủ ~80% lượng điện
 const OFFSET_RATE   = 0.72;       // Thực tế cắt được ~72% điện lưới (đã trừ lệch giờ, ngày mây, hao pin)
@@ -716,14 +716,14 @@ function setActiveChip(id) {
 })();
 renderTg();
 </script>
-<!-- LOC LINH AI WIDGET START -->
+
+<!-- ═══════════════════════════════════════
+     TRỢ LÝ LỘC LINH — NHÚNG VÀO TRƯỚC </body>
+═══════════════════════════════════════ -->
 <style>
-/* ── RESET ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ══════════════════════════════
-   FAB BUTTON
-══════════════════════════════ */
+/* FAB */
 #ll-fab {
   position: fixed; bottom: 24px; right: 24px; z-index: 9999;
   width: 60px; height: 60px; border-radius: 50%;
@@ -743,12 +743,10 @@ renderTg();
   display: none; align-items: center; justify-content: center;
 }
 
-/* ══════════════════════════════
-   CHAT PANEL
-══════════════════════════════ */
+/* PANEL */
 #ll-panel {
   position: fixed; bottom: 96px; right: 24px; z-index: 9998;
-  width: 360px; max-height: 560px;
+  width: 360px; max-height: 580px;
   background: #fff; border-radius: 16px;
   box-shadow: 0 8px 40px rgba(0,0,0,0.18);
   display: flex; flex-direction: column; overflow: hidden;
@@ -756,133 +754,119 @@ renderTg();
   opacity: 0; transform: translateY(16px) scale(0.97);
   pointer-events: none;
 }
-#ll-panel.open {
-  opacity: 1; transform: translateY(0) scale(1);
-  pointer-events: all;
-}
+#ll-panel.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
 
 /* Header */
 #ll-header {
   background: linear-gradient(135deg, #0F6B3A, #14A44D);
-  padding: 14px 16px;
-  display: flex; align-items: center; gap: 12px;
-  flex-shrink: 0;
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
 }
 #ll-avatar {
   width: 42px; height: 42px; border-radius: 50%;
-  background: rgba(255,255,255,0.2);
-  border: 2px solid rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5);
   display: flex; align-items: center; justify-content: center;
   font-size: 20px; flex-shrink: 0;
 }
 #ll-header-info { flex: 1; min-width: 0; }
 #ll-header-info h3 { color: #fff; font-size: 14px; font-weight: 700; }
 #ll-header-info p  { color: rgba(255,255,255,0.8); font-size: 11px; margin-top: 2px; }
-#ll-close-btn {
-  background: none; border: none; cursor: pointer;
-  color: rgba(255,255,255,0.8); font-size: 22px; line-height: 1;
-  padding: 4px; flex-shrink: 0;
-}
-#ll-close-btn:hover { color: #fff; }
-
-/* Dot status */
-#ll-status-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: #4ade80; display: inline-block;
-  margin-right: 4px; vertical-align: middle;
-  animation: pulse-green 2s infinite;
-}
-@keyframes pulse-green {
-  0%,100% { opacity: 1; } 50% { opacity: 0.4; }
-}
+#ll-dot { width:8px; height:8px; border-radius:50%; background:#4ade80; display:inline-block; margin-right:4px; vertical-align:middle; animation: pg 2s infinite; }
+@keyframes pg { 0%,100%{opacity:1} 50%{opacity:.4} }
+#ll-close { background:none; border:none; cursor:pointer; color:rgba(255,255,255,.8); font-size:22px; line-height:1; padding:4px; flex-shrink:0; }
+#ll-close:hover { color:#fff; }
 
 /* Messages */
 #ll-messages {
-  flex: 1; overflow-y: auto; padding: 16px;
-  display: flex; flex-direction: column; gap: 10px;
-  scroll-behavior: smooth;
+  flex:1; overflow-y:auto; padding:16px;
+  display:flex; flex-direction:column; gap:10px; scroll-behavior:smooth;
 }
-#ll-messages::-webkit-scrollbar { width: 4px; }
-#ll-messages::-webkit-scrollbar-thumb { background: #cde8d6; border-radius: 4px; }
+#ll-messages::-webkit-scrollbar { width:4px; }
+#ll-messages::-webkit-scrollbar-thumb { background:#cde8d6; border-radius:4px; }
 
-.msg { display: flex; gap: 8px; align-items: flex-end; }
-.msg.bot  { align-self: flex-start; max-width: 88%; }
-.msg.user { align-self: flex-end;   max-width: 88%; flex-direction: row-reverse; }
+.msg { display:flex; gap:8px; align-items:flex-end; }
+.msg.bot  { align-self:flex-start; max-width:90%; }
+.msg.user { align-self:flex-end;   max-width:88%; flex-direction:row-reverse; }
+.msg-av { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#0F6B3A,#14A44D); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.msg-bbl { padding:10px 13px; border-radius:16px; font-size:13.5px; line-height:1.6; word-break:break-word; }
+.msg.bot  .msg-bbl { background:#f0f7f2; color:#1a2e1e; border-bottom-left-radius:4px; }
+.msg.user .msg-bbl { background:linear-gradient(135deg,#0F6B3A,#14A44D); color:#fff; border-bottom-right-radius:4px; }
 
-.msg-avatar {
-  width: 28px; height: 28px; border-radius: 50%;
+/* Link button trong chat */
+.ll-btn-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #0F6B3A; color: #fff !important;
+  padding: 7px 14px; border-radius: 20px;
+  font-size: 12.5px; font-weight: 700;
+  text-decoration: none !important;
+  margin: 3px 2px; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  border: none; font-family: inherit;
+}
+.ll-btn-link:hover { background: #14A44D; transform: scale(1.03); }
+.ll-btn-link.gold { background: #E2B23B; color: #1a2e1e !important; }
+.ll-btn-link.gold:hover { background: #FFD666; }
+.ll-btn-link svg { width:13px; height:13px; fill:currentColor; flex-shrink:0; }
+.ll-btn-row { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+
+/* Form iframe overlay trong panel */
+#ll-form-view {
+  position: absolute; inset: 0; z-index: 10;
+  background: #fff; display: none;
+  flex-direction: column;
+  border-radius: 16px; overflow: hidden;
+}
+#ll-form-view.show { display: flex; }
+#ll-form-header {
   background: linear-gradient(135deg, #0F6B3A, #14A44D);
+  padding: 12px 16px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+#ll-form-header span { color:#fff; font-size:14px; font-weight:700; flex:1; }
+#ll-form-back {
+  background: rgba(255,255,255,0.2); border: none; cursor: pointer;
+  color: #fff; font-size: 13px; padding: 5px 10px; border-radius: 8px;
+  font-family: inherit; display:flex; align-items:center; gap:4px;
+}
+#ll-form-back:hover { background: rgba(255,255,255,0.35); }
+#ll-form-iframe {
+  flex: 1; border: none; width: 100%;
+}
+#ll-form-loading {
+  position: absolute; top: 56px; inset-inline: 0; bottom: 0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 13px; flex-shrink: 0;
+  background: #f0f7f2; font-size: 13px; color: #0F6B3A;
 }
-.msg-bubble {
-  padding: 10px 13px; border-radius: 16px;
-  font-size: 13.5px; line-height: 1.55; word-break: break-word;
-}
-.msg.bot  .msg-bubble { background: #f0f7f2; color: #1a2e1e; border-bottom-left-radius: 4px; }
-.msg.user .msg-bubble { background: linear-gradient(135deg,#0F6B3A,#14A44D); color:#fff; border-bottom-right-radius:4px; }
-.msg-bubble strong { font-weight: 700; }
-.msg-bubble a { color: #0F6B3A; font-weight: 600; text-decoration: underline; }
-.msg.user .msg-bubble a { color: #E2B23B; }
 
-/* typing */
-.typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 2px; }
-.typing-dots span {
-  width: 7px; height: 7px; border-radius: 50%; background: #14A44D;
-  animation: bounce 1.2s infinite ease-in-out;
-}
-.typing-dots span:nth-child(2) { animation-delay: .2s; }
-.typing-dots span:nth-child(3) { animation-delay: .4s; }
-@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+/* Typing */
+.tdots { display:flex; gap:4px; align-items:center; padding:4px 2px; }
+.tdots span { width:7px; height:7px; border-radius:50%; background:#14A44D; animation:bn 1.2s infinite ease-in-out; }
+.tdots span:nth-child(2){animation-delay:.2s} .tdots span:nth-child(3){animation-delay:.4s}
+@keyframes bn { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
 
-/* quick replies */
-#ll-quick { padding: 6px 16px 10px; display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0; }
-.qr-btn {
-  background: #f0f7f2; border: 1.5px solid #14A44D;
-  color: #0F6B3A; border-radius: 100px;
-  padding: 6px 13px; font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all .15s; white-space: nowrap; font-family: inherit;
-}
-.qr-btn:hover { background: #14A44D; color: #fff; }
+/* Quick replies */
+#ll-quick { padding:6px 16px 10px; display:flex; flex-wrap:wrap; gap:6px; flex-shrink:0; }
+.qr { background:#f0f7f2; border:1.5px solid #14A44D; color:#0F6B3A; border-radius:100px; padding:6px 13px; font-size:12px; font-weight:600; cursor:pointer; transition:all .15s; white-space:nowrap; font-family:inherit; }
+.qr:hover { background:#14A44D; color:#fff; }
 
-/* input */
-#ll-input-area {
-  padding: 10px 12px 12px; display: flex; gap: 8px; align-items: flex-end;
-  border-top: 1px solid #e8f3ec; flex-shrink: 0; background: #fff;
-}
-#ll-textarea {
-  flex: 1; resize: none; border: 1.5px solid #cde8d6; border-radius: 12px;
-  padding: 9px 12px; font-size: 13.5px; font-family: inherit; line-height: 1.4;
-  color: #1a2e1e; outline: none; max-height: 90px; transition: border-color .2s;
-}
-#ll-textarea:focus { border-color: #14A44D; }
-#ll-textarea::placeholder { color: #a0c0a8; }
-#ll-send {
-  width: 40px; height: 40px; border-radius: 50%;
-  background: linear-gradient(135deg,#0F6B3A,#14A44D);
-  border: none; cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: transform .15s, opacity .15s;
-}
-#ll-send:hover { transform: scale(1.08); }
-#ll-send:disabled { opacity: .45; cursor: default; transform: none; }
-#ll-send svg { width: 18px; height: 18px; fill: #fff; }
+/* Input */
+#ll-input { padding:10px 12px 12px; display:flex; gap:8px; align-items:flex-end; border-top:1px solid #e8f3ec; flex-shrink:0; background:#fff; }
+#ll-ta { flex:1; resize:none; border:1.5px solid #cde8d6; border-radius:12px; padding:9px 12px; font-size:13.5px; font-family:inherit; line-height:1.4; color:#1a2e1e; outline:none; max-height:90px; transition:border-color .2s; }
+#ll-ta:focus { border-color:#14A44D; }
+#ll-ta::placeholder { color:#a0c0a8; }
+#ll-btn { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#0F6B3A,#14A44D); border:none; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:transform .15s,opacity .15s; }
+#ll-btn:hover { transform:scale(1.08); }
+#ll-btn:disabled { opacity:.4; cursor:default; transform:none; }
+#ll-btn svg { width:18px; height:18px; fill:#fff; }
+#ll-foot { text-align:center; font-size:10px; color:#aaa; padding:4px 0 8px; flex-shrink:0; }
 
-#ll-footer { text-align: center; font-size: 10px; color: #aaa; padding: 4px 0 8px; flex-shrink: 0; }
-
-/* mobile */
-@media (max-width: 420px) {
-  #ll-panel { width: calc(100vw - 24px); right: 12px; bottom: 82px; }
-  #ll-fab   { right: 12px; bottom: 12px; }
+@media (max-width:420px) {
+  #ll-panel { width:calc(100vw - 24px); right:12px; bottom:82px; }
+  #ll-fab   { right:12px; bottom:12px; }
 }
 </style>
 
-<!-- ═══════════════════════════════════════
-     CẤU HÌNH – CHỈ SỬA 1 DÒNG NÀY
-════════════════════════════════════════ -->
+<!-- ⬇️ CHỈ SỬA DÒNG NÀY sau khi deploy Worker -->
 <script>
-  // ⬇️ Thay bằng URL Worker của bạn sau khi deploy
-  const WORKER_URL = 'https://loclinh-agent.pandapop174.workers.dev/';
+const WORKER_URL = 'https://loclinh-agent.pandapop174.workers.dev';
 </script>
 
 <!-- FAB -->
@@ -893,131 +877,74 @@ renderTg();
 
 <!-- PANEL -->
 <div id="ll-panel">
+
+  <!-- Header chat -->
   <div id="ll-header">
     <div id="ll-avatar">☀️</div>
     <div id="ll-header-info">
       <h3>Trợ lý Lộc Linh</h3>
-      <p><span id="ll-status-dot"></span>Tư vấn điện mặt trời · Nghệ An</p>
+      <p><span id="ll-dot"></span>Tư vấn điện mặt trời · Nghệ An</p>
     </div>
-    <button id="ll-close-btn" onclick="llToggle()">×</button>
+    <button id="ll-close" onclick="llToggle()">×</button>
   </div>
+
+  <!-- Messages -->
   <div id="ll-messages"></div>
   <div id="ll-quick"></div>
-  <div id="ll-input-area">
-    <textarea id="ll-textarea" rows="1"
-      placeholder="Hỏi về điện mặt trời…"
-      onkeydown="llKeydown(event)"
-      oninput="llAutoResize(this)"></textarea>
-    <button id="ll-send" onclick="llSend()">
+  <div id="ll-input">
+    <textarea id="ll-ta" rows="1" placeholder="Hỏi về điện mặt trời…"
+      onkeydown="llKey(event)" oninput="llResize(this)"></textarea>
+    <button id="ll-btn" onclick="llSend()">
       <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
   </div>
-  <div id="ll-footer">Powered by Claude AI · Lộc Linh Solar</div>
+  <div id="ll-foot">Powered by Claude AI · Lộc Linh Solar</div>
+
+  <!-- Form overlay (mở trong panel) -->
+  <div id="ll-form-view">
+    <div id="ll-form-header">
+      <button id="ll-form-back" onclick="llCloseForm()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Quay lại
+      </button>
+      <span>📋 Đăng ký nhận báo giá</span>
+    </div>
+    <div id="ll-form-loading">Đang tải form…</div>
+    <iframe id="ll-form-iframe" src="" title="Form đăng ký" onload="llFormLoaded()"></iframe>
+  </div>
+
 </div>
 
 <script>
-/* ══════════════════════════════════════════════════
-   SYSTEM PROMPT
-══════════════════════════════════════════════════ */
-const SYSTEM_PROMPT = `Bạn là **Trợ lý Lộc Linh** – trợ lý tư vấn điện mặt trời của **Lộc Linh Solar**, công ty phân phối và lắp đặt điện mặt trời tại Nghệ An (TT. Cầu Giát, Quỳnh Lưu).
+/* STATE */
+let isOpen=false, busy=false, history=[];
 
-## GIỌNG ĐIỆU
-- Thân thiện, gần gũi, mang chất miền Trung: xưng "anh/chị" và "em"
-- Ngắn gọn, đi thẳng vào vấn đề
-- Nhiệt tình, tạo niềm tin
+const FORM_URL   = 'https://loclinhsolar.github.io/form/';
+const PAGE_LINKS = {
+  form:      { url: FORM_URL,                                          label: '📋 Đăng ký báo giá',   gold: true  },
+  catalogue: { url: 'https://loclinhsolar.github.io/catalogue/',       label: '📦 Xem catalogue',      gold: false },
+  mayttinh:  { url: 'https://loclinhsolar.github.io/maytinhtiendien/', label: '🧮 Máy tính tiết kiệm', gold: false },
+  congtrinh: { url: 'https://loclinhsolar.github.io/congtrinh/',       label: '🏗 Công trình thực tế', gold: false },
+  hotline:   { url: 'tel:0817345555',                                  label: '📞 Gọi 0817.345.555',   gold: true  },
+};
 
-## NHIỆM VỤ
-✅ Giải thích điện mặt trời hoạt động như thế nào
-✅ Tính ước lượng tiết kiệm điện theo hóa đơn khách cung cấp
-✅ Gợi ý công suất hệ thống phù hợp (kWp)
-✅ Tư vấn sản phẩm Tier 1 (SolaX Cao Cấp), Tier 2 (GoodWe Cao Cấp), Tier 3 (Trung Cấp)
-✅ So sánh SolaX vs GoodWe, bảo hành, quy trình lắp đặt
-✅ Trả lời FAQ: mất điện có dùng được không, lắp mấy ngày, trả góp, khu vực
-✅ Kể về công trình thực tế Lộc Linh tại Nghệ An
-✅ Hướng dẫn khách đến đúng trang
+// Map từ keywords trong reply → button
+const LINK_KEYWORDS = [
+  { keys: ['loclinhsolar.github.io/form', '/form/', 'điền form', 'điền thông tin', 'để lại thông tin', 'đăng ký', 'báo giá miễn phí'], page: 'form' },
+  { keys: ['loclinhsolar.github.io/catalogue', '/catalogue/', 'xem catalogue', 'catalogue sản phẩm'], page: 'catalogue' },
+  { keys: ['loclinhsolar.github.io/maytinhtiendien', '/maytinhtiendien/', 'máy tính', 'tính tiết kiệm'], page: 'mayttinh' },
+  { keys: ['loclinhsolar.github.io/congtrinh', '/congtrinh/', 'công trình thực tế', 'xem công trình'], page: 'congtrinh' },
+  { keys: ['0817.345.555', '0817345555', 'gọi ngay', 'liên hệ ngay'], page: 'hotline' },
+];
 
-❌ KHÔNG báo giá cụ thể – luôn mời khách để lại thông tin
-❌ KHÔNG tư vấn Tier 4 (LuxPower) & Tier 5 (SVE) qua chat – mời liên hệ trực tiếp
-
-## SẢN PHẨM
-
-### TIER 1 – CAO CẤP (SolaX + Pin TSYS)
-- X1-LITE-LV: 1 pha, 1–6 kW, hiệu suất 97.7%, UPS <20ms, IP65
-- X1-RENO-LV: 1 pha, 3–6 kW, màn hình LCD + WiFi/APP, IP65
-- X1-Hybrid LV: 1 pha, 3.7–6 kW, kết nối pin LV, IP65
-- X3-NEO-LV: 3 pha, 5–15 kW, kết nối song song tối đa 4 máy, IP65
-Pin TSYS: LFP 48V low voltage, ≥6.000 chu kỳ
-
-### TIER 2 – CAO CẤP (GoodWe + Pin Lynx A G4)
-- GW8000-ES-C10: 1 pha, 8/10/12 kW, hiệu suất 97.6%, UPS <4ms, IP66, song song 6 máy
-- ET-LV: 3 pha, 5–20 kW, PV tối đa 40kWp, hiệu suất 97.8%, UPS <4ms, IP66 C4
-Pin Lynx A G4: 16.1 kWh, LFP, DoD 100%, IP55
-
-### TIER 3 – TRUNG CẤP (GoodWe/SolaX + Dyness/Vanyo)
-Pin Dyness PowerBrick: 16.07 kWh, LFP, ≥8.000 chu kỳ, DoD 95%
-Pin Vanyo WY48-314-2: 15.07 kWh, LFP, 6.000 chu kỳ, 15 năm tuổi thọ
-
-### TIER 4 & 5 – KHÔNG TƯ VẤN QUA CHAT
-LuxPower & SVE: "Dòng này cần trao đổi trực tiếp với tư vấn viên. Em hỗ trợ anh/chị điền form hoặc gọi 0817.345.555 nhé!"
-
-## TÍNH TIẾT KIỆM ĐIỆN
-- kWh/tháng ≈ hóa đơn (VNĐ) / 3.000
-- 1 kWp → ~100–120 kWh/tháng tại Nghệ An
-- Công suất cần ≈ kWh / 110
-- Tiết kiệm 60–80% tùy có pin hay không
-- Hoàn vốn: 4–6 năm (không pin), 6–8 năm (có pin)
-
-## QUY TRÌNH
-1. Khảo sát miễn phí (24h sau đăng ký)
-2. Báo giá miễn phí, chi tiết
-3. Ký HĐ, cọc 30%
-4. Thi công 1–2 ngày (HGĐ), 3–5 ngày (công trình lớn)
-5. Nghiệm thu, bàn giao, hướng dẫn APP
-6. Hỗ trợ kỹ thuật 24/7
-
-## BẢO HÀNH
-- Tấm pin: 25 năm hiệu suất, 12 năm sản phẩm
-- Biến tần SolaX/GoodWe: 5–10 năm
-- Pin lưu trữ: 5–10 năm
-- Thi công: 5 năm
-
-## HỖ TRỢ TÀI CHÍNH
-- Vay ngân hàng tới 100.000.000đ
-- Trả góp 0% qua ngân hàng liên kết
-
-## KHU VỰC
-Toàn tỉnh Nghệ An: Quỳnh Lưu, Diễn Châu, Yên Thành, Nghi Lộc, Hưng Nguyên, Đô Lương, Thanh Chương, Nam Đàn, Tân Kỳ, Nghĩa Đàn, Thái Hòa, TP. Vinh và các huyện khác.
-
-## LIÊN HỆ & TRANG WEB
-- Hotline/Zalo: **0817.345.555**
-- Địa chỉ: TT. Cầu Giát, Quỳnh Lưu, Nghệ An
-- Máy tính điện: loclinhsolar.github.io/maytinhtiendien/
-- Catalogue: loclinhsolar.github.io/catalogue/
-- Công trình: loclinhsolar.github.io/congtrinh/
-- Đăng ký tư vấn: loclinhsolar.github.io/form/
-
-## QUY TẮC BÁO GIÁ
-Khi hỏi giá: "Giá phụ thuộc công suất, thiết bị và điều kiện mái nhà. Anh/chị **để lại thông tin tại đây** hoặc gọi **0817.345.555** – tư vấn viên sẽ liên hệ trong 30 phút!"
-
-Dùng Markdown nhẹ. Ưu tiên ngắn gọn, đủ ý.`;
-
-/* ══════════════════════════════
-   STATE
-══════════════════════════════ */
-let isOpen   = false;
-let isTyping = false;
-let history  = [];
-
-const QUICK_INIT = [
+const QR_INIT = [
   'Hóa đơn 2 triệu, lắp bao nhiêu kWp?',
   'SolaX và GoodWe khác nhau gì?',
-  'Bảo hành bao lâu?',
+  'Mất điện có dùng được không?',
   'Có trả góp không?',
 ];
 
-/* ══════════════════════════════
-   TOGGLE
-══════════════════════════════ */
+/* TOGGLE */
 function llToggle() {
   isOpen = !isOpen;
   document.getElementById('ll-panel').classList.toggle('open', isOpen);
@@ -1025,150 +952,188 @@ function llToggle() {
   if (isOpen && history.length === 0) llGreet();
 }
 
-/* ══════════════════════════════
-   GREETING
-══════════════════════════════ */
+/* GREETING */
 function llGreet() {
-  const g = "Chào anh/chị! Em là **Trợ lý Lộc Linh** ☀️\n\nEm có thể giúp anh/chị:\n- Tính tiết kiệm điện theo hóa đơn\n- Tư vấn hệ thống phù hợp\n- So sánh SolaX vs GoodWe\n- Giải đáp mọi câu hỏi về lắp đặt điện mặt trời tại Nghệ An\n\nAnh/chị cần hỗ trợ gì ạ?";
-  appendMsg('bot', g);
-  showQR(QUICK_INIT);
+  addMsg('bot', 'Chào anh/chị! Em là **Trợ lý Lộc Linh** ☀️\n\nAnh/chị đang đóng tiền điện khoảng bao nhiêu mỗi tháng ạ? Em tính tiết kiệm cho anh/chị ngay!');
+  showQR(QR_INIT);
 }
 
-/* ══════════════════════════════
-   APPEND
-══════════════════════════════ */
-function appendMsg(role, text) {
+/* ADD MESSAGE */
+function addMsg(role, text) {
   const wrap = document.getElementById('ll-messages');
-  const div  = document.createElement('div');
-  div.className = 'msg ' + role;
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+
   if (role === 'bot') {
-    div.innerHTML = `<div class="msg-avatar">☀️</div><div class="msg-bubble">${md(text)}</div>`;
+    const rendered = md(text);
+    const buttons  = buildButtons(text);
+    d.innerHTML = `<div class="msg-av">☀️</div><div class="msg-bbl">${rendered}${buttons}</div>`;
   } else {
-    div.innerHTML = `<div class="msg-bubble">${esc(text)}</div>`;
+    d.innerHTML = `<div class="msg-bbl">${esc(text)}</div>`;
   }
-  wrap.appendChild(div);
+  wrap.appendChild(d);
   wrap.scrollTop = wrap.scrollHeight;
 }
 
-/* ══════════════════════════════
-   TYPING
-══════════════════════════════ */
-let _typingEl = null;
+/* PHÁT HIỆN LINKS VÀ BUILD BUTTONS */
+function buildButtons(text) {
+  const lower = text.toLowerCase();
+  const found = new Set();
+
+  for (const { keys, page } of LINK_KEYWORDS) {
+    for (const k of keys) {
+      if (lower.includes(k.toLowerCase())) {
+        found.add(page);
+        break;
+      }
+    }
+  }
+
+  if (found.size === 0) return '';
+
+  let btns = '<div class="ll-btn-row">';
+  for (const page of found) {
+    const { url, label, gold } = PAGE_LINKS[page];
+    const cls = gold ? 'll-btn-link gold' : 'll-btn-link';
+
+    if (page === 'form') {
+      // Form mở trong panel
+      btns += `<button class="${cls}" onclick="llOpenForm()">${label}</button>`;
+    } else if (page === 'hotline') {
+      btns += `<a class="${cls}" href="${url}">${label}</a>`;
+    } else {
+      // Các trang khác mở tab mới
+      const icon = `<svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>`;
+      btns += `<a class="${cls}" href="${url}" target="_blank" rel="noopener">${label} ${icon}</a>`;
+    }
+  }
+  btns += '</div>';
+  return btns;
+}
+
+/* FORM TRONG PANEL */
+function llOpenForm() {
+  const fv = document.getElementById('ll-form-view');
+  const iframe = document.getElementById('ll-form-iframe');
+  const loading = document.getElementById('ll-form-loading');
+  loading.style.display = 'flex';
+  iframe.style.opacity = '0';
+  iframe.src = FORM_URL;
+  fv.classList.add('show');
+}
+function llCloseForm() {
+  const fv = document.getElementById('ll-form-view');
+  fv.classList.remove('show');
+  document.getElementById('ll-form-iframe').src = '';
+}
+function llFormLoaded() {
+  document.getElementById('ll-form-loading').style.display = 'none';
+  document.getElementById('ll-form-iframe').style.opacity = '1';
+}
+
+/* TYPING */
+let _t = null;
 function showTyping() {
   const wrap = document.getElementById('ll-messages');
-  _typingEl = document.createElement('div');
-  _typingEl.className = 'msg bot';
-  _typingEl.innerHTML = `<div class="msg-avatar">☀️</div><div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-  wrap.appendChild(_typingEl);
-  wrap.scrollTop = wrap.scrollHeight;
+  _t = document.createElement('div');
+  _t.className = 'msg bot';
+  _t.innerHTML = '<div class="msg-av">☀️</div><div class="msg-bbl"><div class="tdots"><span></span><span></span><span></span></div></div>';
+  wrap.appendChild(_t); wrap.scrollTop = wrap.scrollHeight;
 }
-function hideTyping() { if (_typingEl) { _typingEl.remove(); _typingEl = null; } }
+function hideTyping() { if (_t) { _t.remove(); _t = null; } }
 
-/* ══════════════════════════════
-   QUICK REPLIES
-══════════════════════════════ */
+/* QUICK REPLIES */
 function showQR(arr) {
-  const wrap = document.getElementById('ll-quick');
-  wrap.innerHTML = '';
+  const w = document.getElementById('ll-quick');
+  w.innerHTML = '';
   arr.forEach(q => {
     const b = document.createElement('button');
-    b.className = 'qr-btn'; b.textContent = q;
+    b.className = 'qr'; b.textContent = q;
     b.onclick = () => { clearQR(); llSendText(q); };
-    wrap.appendChild(b);
+    w.appendChild(b);
   });
 }
 function clearQR() { document.getElementById('ll-quick').innerHTML = ''; }
 
-/* ══════════════════════════════
-   SEND
-══════════════════════════════ */
+/* SEND */
 function llSend() {
-  const ta  = document.getElementById('ll-textarea');
+  const ta = document.getElementById('ll-ta');
   const txt = ta.value.trim();
-  if (!txt || isTyping) return;
+  if (!txt || busy) return;
   ta.value = ''; ta.style.height = '';
-  clearQR();
-  llSendText(txt);
+  clearQR(); llSendText(txt);
 }
 
 async function llSendText(text) {
-  if (isTyping) return;
-  isTyping = true;
-  appendMsg('user', text);
-  history.push({ role: 'user', content: text });
-  document.getElementById('ll-send').disabled = true;
+  if (busy) return;
+  busy = true;
+  addMsg('user', text);
+  history.push({ role:'user', content: text });
+  document.getElementById('ll-btn').disabled = true;
   showTyping();
 
   try {
-    // Gọi Cloudflare Worker (không lộ API key)
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model:      'claude-sonnet-4-6',
-        max_tokens: 1000,
-        system:     SYSTEM_PROMPT,
-        messages:   history,
-      }),
+      body: JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:1000, messages: history }),
     });
-
     const data  = await res.json();
     const reply = data?.content?.[0]?.text
-      || 'Xin lỗi anh/chị, em gặp sự cố kỹ thuật. Vui lòng thử lại hoặc gọi **0817.345.555** ạ!';
+      || 'Xin lỗi anh/chị, em gặp sự cố. Vui lòng thử lại hoặc gọi **0817.345.555** ạ!';
 
     hideTyping();
-    appendMsg('bot', reply);
-    history.push({ role: 'assistant', content: reply });
+    addMsg('bot', reply);
+    history.push({ role:'assistant', content: reply });
 
-    const fu = followUp(text, reply);
+    const fu = getFollowUp(text, reply);
     if (fu.length) showQR(fu);
 
-  } catch (e) {
+  } catch(e) {
     hideTyping();
-    appendMsg('bot', '⚠️ Không kết nối được. Anh/chị vui lòng gọi **0817.345.555** nhé!');
+    addMsg('bot', '⚠️ Không kết nối được. Anh/chị vui lòng gọi **0817.345.555** nhé!');
   }
 
-  isTyping = false;
-  document.getElementById('ll-send').disabled = false;
+  busy = false;
+  document.getElementById('ll-btn').disabled = false;
 }
 
-/* gợi ý follow-up */
-function followUp(userText, botReply) {
-  const t = (userText + botReply).toLowerCase();
+/* FOLLOW-UP */
+function getFollowUp(u, b) {
+  const t = (u+b).toLowerCase();
   if (t.includes('giá') || t.includes('báo giá') || t.includes('chi phí'))
     return ['Điền form nhận báo giá miễn phí', 'Gọi 0817.345.555'];
-  if (t.includes('kwp') || t.includes('công suất'))
+  if (t.includes('kwp') || t.includes('công suất') || t.includes('tiết kiệm'))
     return ['Xem catalogue sản phẩm', 'Quy trình lắp đặt thế nào?'];
   if (t.includes('solax') || t.includes('goodwe') || t.includes('dyness'))
     return ['Dòng nào phù hợp nhất với tôi?', 'Bảo hành ra sao?'];
   if (t.includes('bảo hành') || t.includes('lắp đặt'))
-    return ['Khu vực nào được phục vụ?', 'Tính tiết kiệm điện cho tôi'];
-  if (t.includes('hoàn vốn') || t.includes('tiết kiệm'))
-    return ['Xem công trình thực tế', 'Đăng ký khảo sát miễn phí'];
+    return ['Khu vực nào được phục vụ?', 'Đăng ký khảo sát miễn phí'];
+  if (t.includes('hoàn vốn') || t.includes('mấy năm'))
+    return ['Xem công trình thực tế', 'Tính tiết kiệm cho hóa đơn của tôi'];
   return [];
 }
 
-/* ══════════════════════════════
-   HELPERS
-══════════════════════════════ */
-function llKeydown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); llSend(); }
-}
-function llAutoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 90) + 'px';
-}
-function esc(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+/* HELPERS */
+function llKey(e)     { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();llSend();} }
+function llResize(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,90)+'px'; }
+function esc(s)       { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function md(s) {
-  s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-  s = s.replace(/\*(.+?)\*/g, '<em>$1</em>');
-  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-  s = s.replace(/\n/g, '<br>');
+  // Xóa URLs dạng [text](url) và url thô ra khỏi text — sẽ thành button
+  s = s.replace(/\[([^\]]+)\]\(https?:\/\/loclinhsolar[^)]+\)/g, '$1');
+  s = s.replace(/https?:\/\/loclinhsolar\.github\.io\/\S*/g, '');
+  s = s.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  s = s.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  // Link hotline
+  s = s.replace(/\b(0817[\.\s]?345[\.\s]?555)\b/g,'<a href="tel:0817345555" style="color:#0F6B3A;font-weight:700">$1</a>');
+  s = s.replace(/\n/g,'<br>');
   return s;
 }
 </script>
-<!-- LOC LINH AI WIDGET END -->
+</body>
+</html>
+
+<!-- ═══ KẾT THÚC TRỢ LÝ LỘC LINH ═══ -->
+
 </body>
 </html>
