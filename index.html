@@ -1384,7 +1384,10 @@ function llBridgeCalcResult(r) {
   history.push({ role: 'assistant', content: note });
 }
 
-
+/* ═══════════════════════════════════════
+   GREETING
+═══════════════════════════════════════ */
+function llGreet() {
   addMsg('bot','Chào anh/chị! Em là **Trợ lý Lộc Linh** ☀️\n\nAnh/chị đang đóng tiền điện khoảng bao nhiêu mỗi tháng ạ? Em tính tiết kiệm ngay cho anh/chị!');
   showQR(QR_INIT);
 }
