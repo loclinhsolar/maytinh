@@ -1489,7 +1489,7 @@ async function llSendText(text) {
     const res=await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:history,page_context:PAGE_CONTEXT,page_meta:pageMeta||undefined}),
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:history,page_context:PAGE_CONTEXT,page_meta:pageMeta||undefined,lead_submitted:leadSubmitted||undefined}),
     });
     const data=await res.json();
     const reply=data?.content?.[0]?.text||'Xin lỗi anh/chị, em gặp sự cố. Vui lòng gọi **0817.345.555** ạ!';
