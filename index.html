@@ -1477,6 +1477,12 @@ function llSend() {
   clearQR(); llSendText(txt);
 }
 
+async function llPostWorker(payload) {
+  const res = await fetch(WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:payload});
+  const data = await res.json();
+  return data;
+}
+
 async function llSendText(text) {
   if(busy)return;
   busy=true;
@@ -1484,13 +1490,15 @@ async function llSendText(text) {
   history.push({role:'user',content:text});
   document.getElementById('ll-btn').disabled=true;
   showTyping();
+  const payload = JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:history,page_context:PAGE_CONTEXT,page_meta:pageMeta||undefined,lead_submitted:leadSubmitted||undefined});
+  let data;
   try {
-    const res=await fetch(WORKER_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:history,page_context:PAGE_CONTEXT,page_meta:pageMeta||undefined,lead_submitted:leadSubmitted||undefined}),
-    });
-    const data=await res.json();
+    try {
+      data = await llPostWorker(payload);
+    } catch(e1) {
+      await new Promise(r=>setTimeout(r,2000));
+      data = await llPostWorker(payload);
+    }
     const reply=data?.content?.[0]?.text||'Xin lỗi anh/chị, em gặp sự cố. Vui lòng gọi **0817.345.555** ạ!';
     hideTyping();
     addMsg('bot',reply);
@@ -1499,7 +1507,8 @@ async function llSendText(text) {
     if(fu.length)showQR(fu);
   } catch(e) {
     hideTyping();
-    addMsg('bot','⚠️ Không kết nối được. Anh/chị vui lòng gọi **0817.345.555** nhé!');
+    addMsg('bot','⚠️ Mạng chậm, anh/chị thử nhắn lại sau vài giây hoặc gọi **0817.345.555** nhé!');
+    history.pop();
   }
   busy=false;
   document.getElementById('ll-btn').disabled=false;
