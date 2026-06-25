@@ -149,6 +149,39 @@ main { flex:1; max-width:620px; width:100%; margin:0 auto; padding:32px 20px 48p
 }
 .calc-mode-note strong { color:var(--green); }
 
+.biz-profile-box {
+  display:none;
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  background:linear-gradient(135deg, rgba(15,107,58,.05), rgba(226,178,59,.08));
+  border:1px solid var(--line);
+}
+.biz-profile-box.show { display:block; }
+.biz-profile-title {
+  font-size:11px; font-weight:800; letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--green); margin-bottom:8px;
+}
+.biz-profile-grid {
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;
+}
+.biz-profile-btn {
+  border:1.5px solid var(--line); background:var(--card); border-radius:12px;
+  padding:9px 8px; cursor:pointer; text-align:left;
+  font-family:'Be Vietnam Pro',sans-serif; transition:all .2s;
+}
+.biz-profile-btn strong { display:block; font-size:12px; color:var(--ink); line-height:1.25; }
+.biz-profile-btn span { display:block; font-size:10px; color:var(--muted); margin-top:3px; line-height:1.25; }
+.biz-profile-btn.active {
+  border-color:var(--gold); background:#FFF8E8;
+  box-shadow:0 3px 10px rgba(226,178,59,.16);
+}
+.biz-profile-btn.active strong { color:var(--green); }
+.biz-mix-note {
+  margin-top:10px; font-size:11px; color:var(--muted); line-height:1.55;
+}
+.biz-mix-note b { color:var(--green); }
+
 /* ── RESULT ─────────────────────────────────── */
 .result-card { overflow:hidden; display:none; animation:fadeUp .35s ease; margin-bottom:16px; }
 .result-card.show { display:block; }
@@ -409,6 +442,22 @@ p svg, span svg, a svg, td svg, li svg, div svg:not(.btn-icon svg):not(.btn-icon
         </button>
       </div>
       <div class="calc-mode-note" id="calcModeNote"><strong>Sinh hoạt:</strong> điện mặt trời cắt phần bậc 3–5 giá cao trước, phù hợp hộ gia đình hóa đơn lớn.</div>
+
+      <div class="biz-profile-box" id="bizProfileBox">
+        <div class="biz-profile-title">Chọn loại hình kinh doanh để AI ước tính sát hơn</div>
+        <div class="biz-profile-grid">
+          <button class="biz-profile-btn active" data-profile="internet" onclick="setBizProfile('internet', this)"><strong>Quán Internet</strong><span>Cao điểm rất mạnh</span></button>
+          <button class="biz-profile-btn" data-profile="bida" onclick="setBizProfile('bida', this)"><strong>Bida / giải trí</strong><span>Chiều tối nhiều</span></button>
+          <button class="biz-profile-btn" data-profile="cafe" onclick="setBizProfile('cafe', this)"><strong>Cafe</strong><span>Ban ngày + tối</span></button>
+          <button class="biz-profile-btn" data-profile="restaurant" onclick="setBizProfile('restaurant', this)"><strong>Nhà hàng</strong><span>Cao điểm tối</span></button>
+          <button class="biz-profile-btn" data-profile="office" onclick="setBizProfile('office', this)"><strong>Văn phòng</strong><span>Chủ yếu ban ngày</span></button>
+          <button class="biz-profile-btn" data-profile="factory" onclick="setBizProfile('factory', this)"><strong>Nhà xưởng</strong><span>Ban ngày nhiều</span></button>
+          <button class="biz-profile-btn" data-profile="shop" onclick="setBizProfile('shop', this)"><strong>Cửa hàng</strong><span>Cân bằng</span></button>
+          <button class="biz-profile-btn" data-profile="hotel" onclick="setBizProfile('hotel', this)"><strong>Khách sạn</strong><span>Cả ngày & đêm</span></button>
+          <button class="biz-profile-btn" data-profile="other" onclick="setBizProfile('other', this)"><strong>Khác</strong><span>Mặc định kinh doanh</span></button>
+        </div>
+        <div class="biz-mix-note" id="bizMixNote"></div>
+      </div>
     </div>
     <div class="field-label"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#FFD666" d="M31.898 23.938C31.3 17.32 28 14 28 14l-6-8h-8l-6 8s-1.419 1.433-2.567 4.275C3.444 18.935 2 20.789 2 23c0 1.448.625 2.742 1.609 3.655C3.233 27.357 3 28.147 3 29c0 1.958 1.136 3.636 2.775 4.456C7.058 35.378 8.772 36 10 36h16c1.379 0 3.373-.779 4.678-3.31C32.609 31.999 34 30.17 34 28c0-1.678-.834-3.154-2.102-4.062zM18 6c.55 0 1.058-.158 1.5-.416.443.258.951.416 1.5.416 1.657 0 4-2.344 4-4 0 0 0-2-2-2-.788 0-1 1-2 1s-1-1-3-1-2 1-3 1-1.211-1-2-1c-2 0-2 2-2 2 0 1.656 2.344 4 4 4 .549 0 1.057-.158 1.5-.416.443.258.951.416 1.5.416z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#B5790F" d="M24 6c0 .552-.447 1-1 1H13c-.552 0-1-.448-1-1s.448-1 1-1h10c.553 0 1 .448 1 1z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#0F6B3A" d="M23.901 24.542c0-4.477-8.581-4.185-8.581-6.886 0-1.308 1.301-1.947 2.811-1.947 2.538 0 2.99 1.569 4.139 1.569.813 0 1.205-.493 1.205-1.046 0-1.284-2.024-2.256-3.965-2.592V12.4c0-.773-.65-1.4-1.454-1.4-.805 0-1.456.627-1.456 1.4v1.283c-2.116.463-3.937 1.875-3.937 4.176 0 4.299 8.579 4.125 8.579 7.145 0 1.047-1.178 2.093-3.111 2.093-2.901 0-3.867-1.889-5.045-1.889-.574 0-1.087.464-1.087 1.164 0 1.113 1.938 2.451 4.603 2.824l-.001.01v1.398c0 .772.652 1.4 1.456 1.4.804 0 1.455-.628 1.455-1.4v-1.398c0-.017-.008-.03-.009-.045 2.398-.43 4.398-1.932 4.398-4.619z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg> Hóa đơn điện hàng tháng của bạn</div>
     <div class="input-wrap">
@@ -653,14 +702,37 @@ const ELEC_GROWTH   = 0.045;      // Giá điện +5%/năm, trừ suy hao tấm 
 
 // Điện kinh doanh dưới 6kV 2026, giá chưa VAT
 const BIZ_RATES = { off: 1918, normal: 3152, peak: 5422 };
-// Cơ cấu sử dụng mặc định cho hộ kinh doanh/quán/cửa hàng. Có thể tinh chỉnh sau theo dữ liệu công tơ.
-const BIZ_USE_MIX  = { off: 0.10, normal: 0.55, peak: 0.35 };
-// Khi có điện mặt trời + pin lưu trữ, ưu tiên cắt giờ cao điểm trước.
-const BIZ_SAVE_MIX = { normal: 0.38, peak: 0.62 };
-let customerType = 'home';
 
+// Hồ sơ sử dụng điện theo loại hình. Đây là tỷ lệ ước tính để khách chỉ cần nhập hóa đơn,
+// nhưng công thức vẫn bám bảng giá kinh doanh: thấp điểm / bình thường / cao điểm.
+const BIZ_PROFILES = {
+  internet:   { label:'Quán Internet',       use:{off:0.10, normal:0.40, peak:0.50}, save:{normal:0.30, peak:0.70}, note:'Quán Internet thường ăn điện mạnh từ chiều tối đến khuya, nên hệ thống ưu tiên cắt giờ cao điểm nhiều nhất.' },
+  bida:       { label:'Bida / giải trí',     use:{off:0.10, normal:0.45, peak:0.45}, save:{normal:0.34, peak:0.66}, note:'Bida/giải trí thường đông khách buổi chiều tối, tỷ lệ cao điểm cao.' },
+  cafe:       { label:'Cafe',                use:{off:0.15, normal:0.55, peak:0.30}, save:{normal:0.45, peak:0.55}, note:'Cafe dùng điện nhiều ban ngày và vẫn có tải buổi tối.' },
+  restaurant: { label:'Nhà hàng',            use:{off:0.10, normal:0.40, peak:0.50}, save:{normal:0.30, peak:0.70}, note:'Nhà hàng thường cao điểm vào khung tối, phù hợp pin lưu trữ để né giá cao.' },
+  office:     { label:'Văn phòng',           use:{off:0.05, normal:0.90, peak:0.05}, save:{normal:0.85, peak:0.15}, note:'Văn phòng chủ yếu dùng điện ban ngày, điện mặt trời tự dùng trực tiếp là lợi thế chính.' },
+  factory:    { label:'Nhà xưởng',           use:{off:0.25, normal:0.65, peak:0.10}, save:{normal:0.80, peak:0.20}, note:'Nhà xưởng thường chạy nhiều ban ngày, ưu tiên giảm điện bình thường và một phần cao điểm.' },
+  shop:       { label:'Cửa hàng',            use:{off:0.12, normal:0.58, peak:0.30}, save:{normal:0.48, peak:0.52}, note:'Cửa hàng dùng điện tương đối cân bằng giữa ban ngày và buổi tối.' },
+  hotel:      { label:'Khách sạn / homestay',use:{off:0.30, normal:0.45, peak:0.25}, save:{normal:0.55, peak:0.45}, note:'Khách sạn có tải cả ngày lẫn đêm, pin lưu trữ giúp dịch chuyển điện sang giờ giá cao.' },
+  other:      { label:'Hộ kinh doanh khác',  use:{off:0.10, normal:0.55, peak:0.35}, save:{normal:0.38, peak:0.62}, note:'Mặc định cho hộ kinh doanh nhỏ khi chưa rõ ngành nghề.' }
+};
+let customerType = 'home';
+let bizProfileKey = 'internet';
+
+function getBizProfile() { return BIZ_PROFILES[bizProfileKey] || BIZ_PROFILES.other; }
 function weightedRate(mix) {
   return Object.entries(mix).reduce((sum, [k, v]) => sum + BIZ_RATES[k] * v, 0);
+}
+function pctMix(mix) {
+  return 'Thấp điểm ' + Math.round((mix.off || 0)*100) + '% · Bình thường ' + Math.round((mix.normal || 0)*100) + '% · Cao điểm ' + Math.round((mix.peak || 0)*100) + '%';
+}
+function updateBizMixNote() {
+  const box = document.getElementById('bizProfileBox');
+  if (box) box.classList.toggle('show', customerType === 'biz');
+  const el = document.getElementById('bizMixNote');
+  if (!el) return;
+  const p = getBizProfile();
+  el.innerHTML = '<b>' + p.label + ':</b> ' + pctMix(p.use) + '. ' + p.note;
 }
 
 // Tiền điện sinh hoạt đã VAT cho lượng kWh
@@ -686,17 +758,29 @@ function billToKwhHome(bill) {
 }
 
 function billToKwhBiz(bill) {
-  return bill / (weightedRate(BIZ_USE_MIX) * VAT);
+  return bill / (weightedRate(getBizProfile().use) * VAT);
 }
 
 function setCustomerType(type) {
   customerType = type;
   document.getElementById('typeHome').classList.toggle('active', type === 'home');
   document.getElementById('typeBiz').classList.toggle('active', type === 'biz');
+  const p = getBizProfile();
   document.getElementById('calcModeNote').innerHTML = type === 'home'
-    ? '<strong>Sinh hoạt:</strong> điện mặt trời cắt phần bậc 3–5 giá cao trước, phù hợp hộ gia đình hóa đơn lớn.'
-    : '<strong>Hộ kinh doanh:</strong> tính theo điện kinh doanh dưới 6kV. Hệ thống ưu tiên giảm tiền điện giờ cao điểm 17h30–22h30 bằng điện mặt trời + pin lưu trữ.';
-  calculate();
+    ? '<strong>Sinh hoạt:</strong> tính ngược hóa đơn theo biểu giá 5 bậc EVN 2026, rồi cắt phần bậc 3–5 giá cao trước.'
+    : '<strong>Hộ kinh doanh:</strong> tính theo giá kinh doanh dưới 6kV. Đang dùng hồ sơ <b>' + p.label + '</b>, ưu tiên giảm giờ cao điểm 17h30–22h30.';
+  updateBizMixNote();
+  markPending();
+}
+function setBizProfile(key, btn) {
+  bizProfileKey = key;
+  document.querySelectorAll('.biz-profile-btn').forEach(b => b.classList.toggle('active', b.dataset.profile === key));
+  updateBizMixNote();
+  if (customerType === 'biz') {
+    const p = getBizProfile();
+    document.getElementById('calcModeNote').innerHTML = '<strong>Hộ kinh doanh:</strong> tính theo giá kinh doanh dưới 6kV. Đang dùng hồ sơ <b>' + p.label + '</b>, ưu tiên giảm giờ cao điểm 17h30–22h30.';
+    markPending();
+  }
 }
 
 function fmt(n) {
@@ -707,20 +791,30 @@ function fmt(n) {
 }
 function fmtFull(n) { return n.toLocaleString('vi-VN') + 'đ'; }
 
-let calcTimer;
+let hasCalculatedOnce = false;
+let hasPendingChanges = false;
+function markPending() {
+  hasPendingChanges = true;
+  const card = document.getElementById('resultCard');
+  const label = document.getElementById('rBillLabel');
+  if (hasCalculatedOnce && card && card.classList.contains('show') && label) {
+    label.innerHTML = 'Kết quả cũ — bấm <b>TÍNH NGAY</b> để cập nhật';
+  }
+}
 function onInput() {
-  clearTimeout(calcTimer);
   document.querySelectorAll('.qbtn').forEach(b => b.classList.remove('active'));
-  calcTimer = setTimeout(calculate, 600);
+  markPending();
 }
 function setAmount(val, btn) {
   document.getElementById('billInput').value = val;
   document.querySelectorAll('.qbtn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  calculate();
+  markPending();
 }
 
 function calculate() {
+  hasCalculatedOnce = true;
+  hasPendingChanges = false;
   const bill = parseFloat(document.getElementById('billInput').value);
   const card = document.getElementById('resultCard');
   if (!bill || bill < 100000) { card.classList.remove('show'); return; }
@@ -737,7 +831,7 @@ function calculate() {
   const kwhOffset = totalKwh * OFFSET_RATE;
   let monthlySave;
   if (isBiz) {
-    const saveUnitPrice = weightedRate(BIZ_SAVE_MIX) * VAT;
+    const saveUnitPrice = weightedRate(getBizProfile().save) * VAT;
     monthlySave = Math.round(Math.min(kwhOffset * saveUnitPrice, bill * 0.88));
   } else {
     // Sinh hoạt: cắt từ bậc đắt nhất xuống
@@ -764,9 +858,9 @@ function calculate() {
 
   document.getElementById('rBillLabel').textContent      = 'Hóa đơn: ' + fmtFull(bill) + '/tháng';
   document.getElementById('rMonthlySave').textContent    = fmt(monthlySave) + 'đ';
-  document.getElementById('rMonthlySaveSub').textContent = isBiz ? '= ' + Math.round(saveRate*100) + '% hóa đơn (ưu tiên cắt giờ cao điểm)' : '= ' + Math.round(saveRate*100) + '% hóa đơn (cắt điện bậc 3–5 giá cao trước)';
+  document.getElementById('rMonthlySaveSub').textContent = isBiz ? '= ' + Math.round(saveRate*100) + '% hóa đơn (' + getBizProfile().label + ', ưu tiên cắt giờ cao điểm)' : '= ' + Math.round(saveRate*100) + '% hóa đơn (cắt điện bậc 3–5 giá cao trước)';
   document.getElementById('rKwh').textContent            = Math.round(totalKwh).toLocaleString('vi-VN');
-  document.getElementById('rKwhNote').textContent        = isBiz ? 'kWh/tháng theo giá kinh doanh dưới 6kV' : 'kWh/tháng theo biểu giá 5 bậc 2026';
+  document.getElementById('rKwhNote').textContent        = isBiz ? 'kWh/tháng theo giá kinh doanh dưới 6kV · ' + getBizProfile().label : 'kWh/tháng theo biểu giá 5 bậc 2026';
   document.getElementById('rPower').textContent          = power;
   document.getElementById('rYearly').textContent         = fmt(yearlySave);
   document.getElementById('rYearlySub').textContent      = '= ' + fmtFull(yearlySave) + '/năm';
@@ -795,7 +889,7 @@ function calculate() {
       power: power,
       paybackTxt: paybackTxt,
       totalCost: totalCost,
-      customerType: isBiz ? 'Hộ kinh doanh' : 'Sinh hoạt',
+      customerType: isBiz ? ('Hộ kinh doanh - ' + getBizProfile().label) : 'Sinh hoạt',
       totalKwh: Math.round(totalKwh)
     });
   }
