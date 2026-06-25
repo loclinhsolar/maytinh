@@ -119,6 +119,36 @@ main { flex:1; max-width:620px; width:100%; margin:0 auto; padding:32px 20px 48p
 .calc-btn:hover { filter:brightness(1.08); transform:translateY(-1px); }
 .calc-btn:active { transform:translateY(0); }
 
+
+.customer-type {
+  margin-bottom:18px;
+}
+.customer-type-label {
+  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--muted); margin-bottom:10px;
+}
+.customer-type-row {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+}
+.type-btn {
+  border:2px solid var(--line); background:var(--card); border-radius:12px;
+  padding:13px 12px; cursor:pointer; text-align:left;
+  font-family:'Be Vietnam Pro',sans-serif; transition:all .2s;
+}
+.type-btn strong { display:block; font-family:'Oswald',sans-serif; font-size:18px; color:var(--green); letter-spacing:.5px; }
+.type-btn span { display:block; font-size:11px; color:var(--muted); margin-top:3px; line-height:1.35; }
+.type-btn.active {
+  border-color:var(--green2); background:linear-gradient(135deg, var(--soft), #fff);
+  box-shadow:0 3px 12px rgba(15,107,58,.10);
+}
+.type-btn.active strong { color:var(--green2); }
+.calc-mode-note {
+  margin-top:12px; padding:10px 12px; border-radius:10px;
+  background:#FFF8E8; border:1px dashed var(--gold);
+  font-size:11.5px; color:var(--muted); line-height:1.55;
+}
+.calc-mode-note strong { color:var(--green); }
+
 /* ── RESULT ─────────────────────────────────── */
 .result-card { overflow:hidden; display:none; animation:fadeUp .35s ease; margin-bottom:16px; }
 .result-card.show { display:block; }
@@ -211,6 +241,25 @@ main { flex:1; max-width:620px; width:100%; margin:0 auto; padding:32px 20px 48p
 .peak-box strong { color:var(--red); }
 .peak-box .pb-title { font-weight:700; color:var(--green); margin-bottom:4px; }
 
+
+/* EVN tabs: Sinh hoạt / Kinh doanh / Khung giờ */
+.evn-tabs { display:flex; gap:8px; margin-bottom:14px; background:var(--soft); padding:6px; border-radius:14px; border:1px solid var(--line); }
+.evn-tab {
+  flex:1; border:none; border-radius:10px; padding:10px 8px; cursor:pointer;
+  font-family:'Be Vietnam Pro',sans-serif; font-size:12px; font-weight:800;
+  color:var(--green); background:transparent; transition:all .2s ease;
+}
+.evn-tab.active { background:linear-gradient(135deg, var(--green), var(--green2)); color:#fff; box-shadow:0 3px 10px rgba(15,107,58,.22); }
+.evn-panel { display:none; animation:fadeUp .25s ease; }
+.evn-panel.active { display:block; }
+.evn-mini-title { font-family:'Oswald',sans-serif; color:var(--green); font-size:18px; font-weight:700; letter-spacing:.5px; margin:4px 0 8px; }
+.evn-mini-sub { font-size:11.5px; color:var(--muted); line-height:1.5; margin-bottom:12px; }
+.evn-cta-line { margin-top:12px; padding:11px 12px; border-radius:10px; background:linear-gradient(135deg, rgba(15,107,58,.08), rgba(226,178,59,.14)); border:1px solid var(--line); font-size:12px; line-height:1.55; color:var(--ink); }
+.evn-cta-line b { color:var(--green); }
+.evn-cta-line strong { color:var(--red); }
+@media (max-width:480px) {
+  .customer-type-row { grid-template-columns:1fr; } .evn-tabs { gap:5px; padding:5px; } .evn-tab { font-size:11px; padding:9px 5px; } }
+
 /* Trả góp */
 .tg-pick { display:flex; gap:8px; margin-bottom:14px; }
 .tg-amt {
@@ -294,6 +343,7 @@ footer {
 footer strong { color:var(--gold2); }
 
 @media (max-width:480px) {
+  .customer-type-row { grid-template-columns:1fr; }
   .page-title { font-size:28px; }
   .bill-input { font-size:22px; }
   .result-hero-num { font-size:42px; }
@@ -342,10 +392,24 @@ p svg, span svg, a svg, td svg, li svg, div svg:not(.btn-icon svg):not(.btn-icon
 <main>
   <h1 class="page-title">TÍNH <span>TIẾT KIỆM</span><br>TIỀN ĐIỆN</h1>
   <p class="page-sub">Nhập hóa đơn điện hàng tháng — kết quả hiện ngay, hoàn toàn miễn phí</p>
-  <div class="evn-badge">✓ Áp dụng biểu giá điện EVN 5 bậc mới nhất 2026</div>
+  <div class="evn-badge">✓ Có 2 chế độ: Sinh hoạt 5 bậc / Kinh doanh theo giờ 2026</div>
 
   <!-- INPUT -->
   <div class="input-card" id="calc">
+    <div class="customer-type">
+      <div class="customer-type-label">Bạn muốn tính theo nhóm điện nào?</div>
+      <div class="customer-type-row">
+        <button class="type-btn active" id="typeHome" onclick="setCustomerType('home')">
+          <strong>Sinh hoạt</strong>
+          <span>Tính ngược theo biểu giá 5 bậc EVN 2026</span>
+        </button>
+        <button class="type-btn" id="typeBiz" onclick="setCustomerType('biz')">
+          <strong>Hộ kinh doanh</strong>
+          <span>Tính theo điện kinh doanh dưới 6kV: thấp / bình thường / cao điểm</span>
+        </button>
+      </div>
+      <div class="calc-mode-note" id="calcModeNote"><strong>Sinh hoạt:</strong> điện mặt trời cắt phần bậc 3–5 giá cao trước, phù hợp hộ gia đình hóa đơn lớn.</div>
+    </div>
     <div class="field-label"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#FFD666" d="M31.898 23.938C31.3 17.32 28 14 28 14l-6-8h-8l-6 8s-1.419 1.433-2.567 4.275C3.444 18.935 2 20.789 2 23c0 1.448.625 2.742 1.609 3.655C3.233 27.357 3 28.147 3 29c0 1.958 1.136 3.636 2.775 4.456C7.058 35.378 8.772 36 10 36h16c1.379 0 3.373-.779 4.678-3.31C32.609 31.999 34 30.17 34 28c0-1.678-.834-3.154-2.102-4.062zM18 6c.55 0 1.058-.158 1.5-.416.443.258.951.416 1.5.416 1.657 0 4-2.344 4-4 0 0 0-2-2-2-.788 0-1 1-2 1s-1-1-3-1-2 1-3 1-1.211-1-2-1c-2 0-2 2-2 2 0 1.656 2.344 4 4 4 .549 0 1.057-.158 1.5-.416.443.258.951.416 1.5.416z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#B5790F" d="M24 6c0 .552-.447 1-1 1H13c-.552 0-1-.448-1-1s.448-1 1-1h10c.553 0 1 .448 1 1z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#0F6B3A" d="M23.901 24.542c0-4.477-8.581-4.185-8.581-6.886 0-1.308 1.301-1.947 2.811-1.947 2.538 0 2.99 1.569 4.139 1.569.813 0 1.205-.493 1.205-1.046 0-1.284-2.024-2.256-3.965-2.592V12.4c0-.773-.65-1.4-1.454-1.4-.805 0-1.456.627-1.456 1.4v1.283c-2.116.463-3.937 1.875-3.937 4.176 0 4.299 8.579 4.125 8.579 7.145 0 1.047-1.178 2.093-3.111 2.093-2.901 0-3.867-1.889-5.045-1.889-.574 0-1.087.464-1.087 1.164 0 1.113 1.938 2.451 4.603 2.824l-.001.01v1.398c0 .772.652 1.4 1.456 1.4.804 0 1.455-.628 1.455-1.4v-1.398c0-.017-.008-.03-.009-.045 2.398-.43 4.398-1.932 4.398-4.619z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg> Hóa đơn điện hàng tháng của bạn</div>
     <div class="input-wrap">
       <div class="input-prefix"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#9AAAB4" d="M11.858 16.264c.389.389.389 1.025 0 1.414s-1.025.389-1.414 0L1.959 9.192c-.389-.389-.389-1.025 0-1.414s1.025-.389 1.414 0l8.485 8.486zm7.072-7.071c.389.389.389 1.025 0 1.414s-1.025.389-1.414 0L9.029 2.121c-.389-.389-.389-1.025 0-1.414s1.025-.389 1.414 0l8.487 8.486z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#1A2E22" d="M34 36c0-4.966-2.56-8.581-4.562-10.65.898-1.532.704-3.529-.61-4.844l-1.099-1.099c.352-1.332.021-2.806-1.022-3.851l-4.949-4.95c.78-.781.78-2.047 0-2.828-.781-.781-2.049-.781-2.829-.001l-2.826 2.826-.003.002-4.242 4.243-2.828 2.828c-.781.781-.781 2.047 0 2.828.781.781 2.047.781 2.828 0l4.95 4.95c1.044 1.044 2.519 1.373 3.85 1.021l1.101 1.101c1.318 1.318 3.323 1.51 4.857.602C28.099 29.726 30 32.404 30 36h4z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg></div>
@@ -382,7 +446,7 @@ p svg, span svg, a svg, td svg, li svg, div svg:not(.btn-icon svg):not(.btn-icon
       <div class="stat">
         <div class="stat-label"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#0F6B3A" d="M36 32c0 2.209-1.791 4-4 4H4c-2.209 0-4-1.791-4-4V4c0-2.209 1.791-4 4-4h28c2.209 0 4 1.791 4 4v28z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path d="M9.613 6.096H8.492c-.912 0-1.292-.665-1.292-1.311 0-.665.475-1.311 1.292-1.311h2.698c.817 0 1.273.589 1.273 1.349v10.81c0 .95-.608 1.481-1.425 1.481-.817 0-1.425-.532-1.425-1.481V6.096zm5.129 16.627c0 1.196-.513 2.241-1.558 2.906 1.368.627 2.318 1.9 2.318 3.4 0 2.28-2.09 4.198-4.788 4.198-2.812 0-4.559-2.07-4.559-3.571 0-.74.779-1.272 1.463-1.272 1.291 0 .988 2.223 3.134 2.223.988 0 1.786-.76 1.786-1.767 0-2.66-3.23-.703-3.23-2.944 0-1.995 2.698-.646 2.698-2.755 0-.722-.513-1.273-1.368-1.273-1.805 0-1.558 1.862-2.85 1.862-.779 0-1.235-.703-1.235-1.406 0-1.481 2.033-3.077 4.142-3.077 2.736-.001 4.047 1.993 4.047 3.476zm13.373-8.231c.836 0 1.48.38 1.48 1.254S28.951 17 28.228 17h-6.346c-.835 0-1.48-.38-1.48-1.254 0-.399.246-.741.437-.969 1.577-1.881 3.286-3.59 4.729-5.68.343-.494.666-1.083.666-1.767 0-.779-.59-1.463-1.368-1.463-2.185 0-1.14 3.078-2.964 3.078-.912 0-1.387-.646-1.387-1.387 0-2.394 2.128-4.312 4.465-4.312 2.336 0 4.217 1.539 4.217 3.951 0 2.641-2.944 5.262-4.559 7.295h3.477zm-6.934 15.526c-.931 0-1.33-.627-1.33-1.121 0-.418.152-.646.267-.836l4.255-7.713c.418-.76.95-1.102 1.938-1.102 1.102 0 2.184.703 2.184 2.432v5.832h.323c.741 0 1.33.494 1.33 1.254s-.589 1.254-1.33 1.254h-.323v1.614c0 1.007-.398 1.483-1.367 1.483s-1.368-.476-1.368-1.483v-1.614h-4.579zm4.578-7.808h-.038l-2.564 5.3h2.603v-5.3z" fill="#FFFFFF" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg> Điện tiêu thụ ước tính</div>
         <div class="stat-val deep" id="rKwh">—</div>
-        <div class="stat-note">kWh/tháng theo biểu giá 5 bậc 2026</div>
+        <div class="stat-note" id="rKwhNote">kWh/tháng theo biểu giá 5 bậc 2026</div>
       </div>
       <div class="stat">
         <div class="stat-label"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#E2B23B" d="M32.938 15.651C32.792 15.26 32.418 15 32 15H19.925L26.89 1.458c.219-.426.106-.947-.271-1.243C26.437.071 26.218 0 26 0c-.233 0-.466.082-.653.243L18 6.588 3.347 19.243c-.316.273-.43.714-.284 1.105S3.582 21 4 21h12.075L9.11 34.542c-.219.426-.106.947.271 1.243.182.144.401.215.619.215.233 0 .466-.082.653-.243L18 29.412l14.653-12.655c.317-.273.43-.714.285-1.106z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg> Công suất lắp</div>
@@ -437,25 +501,55 @@ p svg, span svg, a svg, td svg, li svg, div svg:not(.btn-icon svg):not(.btn-icon
     <div class="sec-head">
       <div class="sec-head-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#E2B23B" d="M32.938 15.651C32.792 15.26 32.418 15 32 15H19.925L26.89 1.458c.219-.426.106-.947-.271-1.243C26.437.071 26.218 0 26 0c-.233 0-.466.082-.653.243L18 6.588 3.347 19.243c-.316.273-.43.714-.284 1.105S3.582 21 4 21h12.075L9.11 34.542c-.219.426-.106.947.271 1.243.182.144.401.215.619.215.233 0 .466-.082.653-.243L18 29.412l14.653-12.655c.317-.273.43-.714.285-1.106z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg></div>
       <div>
-        <div class="sec-head-title">GIÁ ĐIỆN EVN 2026 — CÀNG DÙNG NHIỀU CÀNG ĐẮT</div>
-        <div class="sec-head-sub">Biểu giá 5 bậc theo QĐ 14/2025/QĐ-TTg · chưa gồm VAT 8%</div>
+        <div class="sec-head-title">GIÁ ĐIỆN EVN 2026 — CHỌN ĐÚNG NHÓM KHÁCH HÀNG</div>
+        <div class="sec-head-sub">Sinh hoạt tính theo bậc · Kinh doanh tính theo giờ · chưa gồm VAT 8%</div>
       </div>
     </div>
     <div class="sec-body">
-      <table class="evn-table">
-        <tr><th>Bậc tiêu thụ</th><th style="text-align:right">Giá (đ/kWh)</th></tr>
-        <tr><td>Bậc 1 · 0 – 100 kWh</td><td class="pr">1.984</td></tr>
-        <tr><td>Bậc 2 · 101 – 200 kWh</td><td class="pr">2.380</td></tr>
-        <tr><td>Bậc 3 · 201 – 400 kWh</td><td class="pr">2.998</td></tr>
-        <tr class="hot"><td>Bậc 4 · 401 – 700 kWh</td><td class="pr">3.571</td></tr>
-        <tr class="hot"><td>Bậc 5 · từ 701 kWh <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><path fill="#E2B23B" d="M2.653 35C.811 35-.001 33.662.847 32.027L16.456 1.972c.849-1.635 2.238-1.635 3.087 0l15.609 30.056c.85 1.634.037 2.972-1.805 2.972H2.653z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#1A2E22" d="M15.583 28.953c0-1.333 1.085-2.418 2.419-2.418 1.333 0 2.418 1.085 2.418 2.418 0 1.334-1.086 2.419-2.418 2.419-1.334 0-2.419-1.085-2.419-2.419zm.186-18.293c0-1.302.961-2.108 2.232-2.108 1.241 0 2.233.837 2.233 2.108v11.938c0 1.271-.992 2.108-2.233 2.108-1.271 0-2.232-.807-2.232-2.108V10.66z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg></td><td class="pr">3.967</td></tr>
-      </table>
-      <div class="evn-note">Điện mặt trời cắt đúng phần điện <b>bậc cao nhất</b> trong hóa đơn của bạn — mỗi kWh tự sản xuất là một kWh giá đắt nhất không phải trả EVN.</div>
-      <div class="peak-box">
-        <div class="pb-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36"><circle fill="#5A7A65" cx="18" cy="18" r="18" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><circle fill="#F0F7F2" cx="18" cy="18" r="14" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#5A7A65" d="M17 29c0 .553.447 1 1 1 .553 0 1-.447 1-1V18c0-.552-.447-1-1-1-.553 0-1 .448-1 1v11z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/><path fill="#5A7A65" d="M23 26.661c-.479.276-1.09.112-1.367-.366l-4.5-7.795c-.276-.478-.112-1.089.366-1.365s1.089-.112 1.366.365l4.5 7.795c.277.478.113 1.09-.365 1.366z" stroke="#fff" stroke-width="0.8" stroke-linejoin="round"/></svg> Khung giờ cao điểm MỚI từ 22/4/2026 (QĐ 963/QĐ-BCT)</div>
-        Thứ 2 – Thứ 7: <strong>17h30 – 22h30</strong> mỗi ngày · Chủ nhật không có giờ cao điểm.<br>
-        Đúng khung giờ này <strong>mặt trời đã tắt</strong> — chỉ hệ có <b>PIN LƯU TRỮ</b> mới phát điện thay lưới, hộ kinh doanh áp giá cao điểm tiết kiệm mạnh nhất ở đây.
+      <div class="evn-tabs" role="tablist" aria-label="Bảng giá điện EVN 2026">
+        <button class="evn-tab active" type="button" onclick="showEvnTab('home', this)">Nhà ở</button>
+        <button class="evn-tab" type="button" onclick="showEvnTab('biz', this)">Kinh doanh</button>
+        <button class="evn-tab" type="button" onclick="showEvnTab('peak', this)">Giờ cao điểm</button>
       </div>
+
+      <div class="evn-panel active" id="evn-home">
+        <div class="evn-mini-title">Giá điện sinh hoạt 2026 — 5 bậc</div>
+        <div class="evn-mini-sub">Dành cho hộ gia đình. Điện mặt trời giúp cắt mạnh phần điện bậc cao trong hóa đơn.</div>
+        <table class="evn-table">
+          <tr><th>Bậc tiêu thụ</th><th style="text-align:right">Giá (đ/kWh)</th></tr>
+          <tr><td>Bậc 1 · 0 – 100 kWh</td><td class="pr">1.984</td></tr>
+          <tr><td>Bậc 2 · 101 – 200 kWh</td><td class="pr">2.380</td></tr>
+          <tr><td>Bậc 3 · 201 – 400 kWh</td><td class="pr">2.998</td></tr>
+          <tr class="hot"><td>Bậc 4 · 401 – 700 kWh</td><td class="pr">3.571</td></tr>
+          <tr class="hot"><td>Bậc 5 · từ 701 kWh ⚠️</td><td class="pr">3.967</td></tr>
+        </table>
+        <div class="evn-cta-line"><b>Nhà ở:</b> dùng càng nhiều càng lên bậc cao. Mỗi kWh điện mặt trời tự dùng là một kWh giá đắt nhất không phải mua từ EVN.</div>
+      </div>
+
+      <div class="evn-panel" id="evn-biz">
+        <div class="evn-mini-title">Giá điện kinh doanh 2026 — theo giờ & cấp điện áp</div>
+        <div class="evn-mini-sub">Dành cho cửa hàng, quán café, nhà hàng, văn phòng, hộ kinh doanh. Nhóm phổ biến nhất thường là <b>dưới 6 kV</b>.</div>
+        <table class="evn-table">
+          <tr><th>Cấp điện áp</th><th style="text-align:right">Thấp điểm</th><th style="text-align:right">Bình thường</th><th style="text-align:right">Cao điểm</th></tr>
+          <tr><td>Từ 22 kV trở lên</td><td class="pr">1.609</td><td class="pr">2.887</td><td class="pr">5.025</td></tr>
+          <tr><td>Từ 6 kV đến dưới 22 kV</td><td class="pr">1.829</td><td class="pr">3.108</td><td class="pr">5.202</td></tr>
+          <tr class="hot"><td>Dưới 6 kV</td><td class="pr">1.918</td><td class="pr">3.152</td><td class="pr">5.422</td></tr>
+        </table>
+        <div class="evn-cta-line"><b>Kinh doanh:</b> điểm đau lớn nhất là <strong>giờ cao điểm 5.422đ/kWh</strong>. Hệ có <b>PIN LƯU TRỮ</b> giúp xả điện thay lưới đúng lúc điện đắt nhất.</div>
+      </div>
+
+      <div class="evn-panel" id="evn-peak">
+        <div class="evn-mini-title">Khung giờ cao điểm mới từ 22/4/2026</div>
+        <div class="peak-box" style="margin-top:0">
+          <div class="pb-title">⏱️ QĐ 963/QĐ-BCT</div>
+          <b>Giờ cao điểm:</b> Thứ 2 – Thứ 7, <strong>17h30 – 22h30</strong>. Chủ nhật không có giờ cao điểm.<br>
+          <b>Giờ thấp điểm:</b> 00h00 – 06h00, tất cả các ngày trong tuần.<br>
+          <b>Giờ bình thường:</b> các khung giờ còn lại.
+        </div>
+        <div class="evn-cta-line">Đúng khung <strong>17h30 – 22h30</strong> thì mặt trời đã yếu/tắt. Vì vậy khách kinh doanh muốn giảm tiền điện giờ cao điểm nên ưu tiên hệ <b>điện mặt trời + pin lưu trữ</b>.</div>
+      </div>
+
+      <div class="evn-note">Số liệu hiển thị là giá chưa VAT. Trang máy tính dùng bảng này để khách chọn đúng nhóm: <b>nhà ở cắt bậc cao</b>, <b>kinh doanh giảm giờ cao điểm</b>.</div>
     </div>
   </div>
 
@@ -557,8 +651,20 @@ const SIZING_COVER  = 0.80;       // Chọn công suất để phủ ~80% lượ
 const OFFSET_RATE   = 0.72;       // Thực tế cắt được ~72% điện lưới (đã trừ lệch giờ, ngày mây, hao pin)
 const ELEC_GROWTH   = 0.045;      // Giá điện +5%/năm, trừ suy hao tấm pin 0,5% → tiết kiệm tăng ~4,5%/năm
 
-// Tiền điện (đã VAT) cho lượng kWh
-function costOf(kwh) {
+// Điện kinh doanh dưới 6kV 2026, giá chưa VAT
+const BIZ_RATES = { off: 1918, normal: 3152, peak: 5422 };
+// Cơ cấu sử dụng mặc định cho hộ kinh doanh/quán/cửa hàng. Có thể tinh chỉnh sau theo dữ liệu công tơ.
+const BIZ_USE_MIX  = { off: 0.10, normal: 0.55, peak: 0.35 };
+// Khi có điện mặt trời + pin lưu trữ, ưu tiên cắt giờ cao điểm trước.
+const BIZ_SAVE_MIX = { normal: 0.38, peak: 0.62 };
+let customerType = 'home';
+
+function weightedRate(mix) {
+  return Object.entries(mix).reduce((sum, [k, v]) => sum + BIZ_RATES[k] * v, 0);
+}
+
+// Tiền điện sinh hoạt đã VAT cho lượng kWh
+function costHome(kwh) {
   let cost = 0, prev = 0;
   for (const t of TIERS) {
     if (kwh <= prev) break;
@@ -569,14 +675,28 @@ function costOf(kwh) {
   return cost * VAT;
 }
 
-// Tính ngược: hóa đơn → kWh (nhị phân)
-function billToKwh(bill) {
+// Tính ngược: hóa đơn sinh hoạt → kWh (nhị phân)
+function billToKwhHome(bill) {
   let lo = 0, hi = 20000;
   for (let i = 0; i < 60; i++) {
     const mid = (lo + hi) / 2;
-    if (costOf(mid) < bill) lo = mid; else hi = mid;
+    if (costHome(mid) < bill) lo = mid; else hi = mid;
   }
   return (lo + hi) / 2;
+}
+
+function billToKwhBiz(bill) {
+  return bill / (weightedRate(BIZ_USE_MIX) * VAT);
+}
+
+function setCustomerType(type) {
+  customerType = type;
+  document.getElementById('typeHome').classList.toggle('active', type === 'home');
+  document.getElementById('typeBiz').classList.toggle('active', type === 'biz');
+  document.getElementById('calcModeNote').innerHTML = type === 'home'
+    ? '<strong>Sinh hoạt:</strong> điện mặt trời cắt phần bậc 3–5 giá cao trước, phù hợp hộ gia đình hóa đơn lớn.'
+    : '<strong>Hộ kinh doanh:</strong> tính theo điện kinh doanh dưới 6kV. Hệ thống ưu tiên giảm tiền điện giờ cao điểm 17h30–22h30 bằng điện mặt trời + pin lưu trữ.';
+  calculate();
 }
 
 function fmt(n) {
@@ -605,19 +725,27 @@ function calculate() {
   const card = document.getElementById('resultCard');
   if (!bill || bill < 100000) { card.classList.remove('show'); return; }
 
-  // 1. Hóa đơn → kWh theo biểu giá 5 bậc 2026 + VAT
-  const totalKwh = billToKwh(bill);
+  // 1. Hóa đơn → kWh theo nhóm điện đã chọn
+  const isBiz = customerType === 'biz';
+  const totalKwh = isBiz ? billToKwhBiz(bill) : billToKwhHome(bill);
 
   // 2. Công suất đề xuất: phủ ~80% lượng điện, làm tròn lên cỡ chuẩn
   const rawPower = (totalKwh * SIZING_COVER) / KWH_PER_KWP;
   const power    = STD_SIZES.find(s => s >= rawPower) || 30;
 
-  // 3. Lượng điện thực tế cắt được — cắt từ bậc đắt nhất xuống
-  const kwhOffset   = totalKwh * OFFSET_RATE;
-  const remainBill  = costOf(totalKwh - kwhOffset);
-  const monthlySave = Math.round(bill - remainBill);
-  const saveRate    = monthlySave / bill;     // % tiền > % điện vì cắt bậc đắt trước
-  const yearlySave  = monthlySave * 12;
+  // 3. Lượng điện thực tế cắt được
+  const kwhOffset = totalKwh * OFFSET_RATE;
+  let monthlySave;
+  if (isBiz) {
+    const saveUnitPrice = weightedRate(BIZ_SAVE_MIX) * VAT;
+    monthlySave = Math.round(Math.min(kwhOffset * saveUnitPrice, bill * 0.88));
+  } else {
+    // Sinh hoạt: cắt từ bậc đắt nhất xuống
+    const remainBill = costHome(totalKwh - kwhOffset);
+    monthlySave = Math.round(bill - remainBill);
+  }
+  const saveRate   = monthlySave / bill;
+  const yearlySave = monthlySave * 12;
 
   // 4. Chi phí từ giá combo thật → hoàn vốn tính xuôi
   const totalCost   = power * PRICE_PER_KWP;
@@ -636,8 +764,9 @@ function calculate() {
 
   document.getElementById('rBillLabel').textContent      = 'Hóa đơn: ' + fmtFull(bill) + '/tháng';
   document.getElementById('rMonthlySave').textContent    = fmt(monthlySave) + 'đ';
-  document.getElementById('rMonthlySaveSub').textContent = '= ' + Math.round(saveRate*100) + '% hóa đơn (cắt điện bậc 3–5 giá cao trước)';
+  document.getElementById('rMonthlySaveSub').textContent = isBiz ? '= ' + Math.round(saveRate*100) + '% hóa đơn (ưu tiên cắt giờ cao điểm)' : '= ' + Math.round(saveRate*100) + '% hóa đơn (cắt điện bậc 3–5 giá cao trước)';
   document.getElementById('rKwh').textContent            = Math.round(totalKwh).toLocaleString('vi-VN');
+  document.getElementById('rKwhNote').textContent        = isBiz ? 'kWh/tháng theo giá kinh doanh dưới 6kV' : 'kWh/tháng theo biểu giá 5 bậc 2026';
   document.getElementById('rPower').textContent          = power;
   document.getElementById('rYearly').textContent         = fmt(yearlySave);
   document.getElementById('rYearlySub').textContent      = '= ' + fmtFull(yearlySave) + '/năm';
@@ -657,14 +786,19 @@ function calculate() {
   setTimeout(() => { document.getElementById('barFill').style.width = (saveRate * 100) + '%'; }, 200);
   setTimeout(() => { card.scrollIntoView({ behavior:'smooth', block:'nearest' }); }, 100);
 
-  // ── CALCULATOR BRIDGE: inject kết quả vào chatbot ─────────
-  llBridgeCalcResult({
-    bill:        bill,
-    monthlySave: monthlySave,
-    saveRate:    Math.round(saveRate * 100),
-    power:       power,
-    paybackTxt:  paybackTxt,
-  });
+  // ── CALCULATOR BRIDGE: gửi kết quả thật sang AI Agent Lộc Linh ──
+  if (typeof llBridgeCalcResult === 'function') {
+    llBridgeCalcResult({
+      bill: bill,
+      monthlySave: monthlySave,
+      saveRate: Math.round(saveRate * 100),
+      power: power,
+      paybackTxt: paybackTxt,
+      totalCost: totalCost,
+      customerType: isBiz ? 'Hộ kinh doanh' : 'Sinh hoạt',
+      totalKwh: Math.round(totalKwh)
+    });
+  }
 }
 
 // ── TRẢ GÓP — số liệu chính thức Lộc Linh (tối đa 100 triệu) ──
@@ -724,6 +858,16 @@ function setActiveChip(id) {
   ids.forEach(id => { const el = document.getElementById(id); if (el) obs.observe(el); });
 })();
 renderTg();
+</script>
+
+<script>
+function showEvnTab(name, btn) {
+  document.querySelectorAll('#evn .evn-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#evn .evn-tab').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('evn-' + name);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
 </script>
 
 <!-- TRỢ LÝ LỘC LINH SOLAR - AI AGENT WIDGET -->
@@ -1342,10 +1486,12 @@ function llToggle() {
 function llBridgeCalcResult(r) {
   const billFmt  = Math.round(r.bill / 1000) * 1000;
   const saveFmt  = r.monthlySave.toLocaleString('vi-VN');
-  const costFmt  = Math.round(r.totalCost / 1000000);
+  const costFmt  = r.totalCost ? Math.round(r.totalCost / 1000000) : null;
+  const typeTxt  = r.customerType || 'Chưa chọn nhóm điện';
+  const kwhTxt   = r.totalKwh ? ` | Điện ước tính: ${r.totalKwh}kWh/tháng` : '';
 
   // Cập nhật pageMeta – worker sẽ nhận được trong mỗi lần gọi tiếp theo
-  pageMeta = `[Kết quả máy tính khách vừa xem] Hóa đơn: ${Math.round(r.bill/1000)*1000}đ/tháng | Tiết kiệm dự kiến: ${saveFmt}đ/tháng (${r.saveRate}%) | Công suất đề xuất: ${r.power}kWp | Hoàn vốn: ~${r.paybackTxt} năm. Khách đã thấy kết quả này, KHÔNG hỏi lại hóa đơn. KHÔNG báo giá chi phí cụ thể – giá phụ thuộc thực tế, phải khảo sát.`;
+  pageMeta = `[Kết quả máy tính khách vừa xem] Nhóm khách: ${typeTxt} | Hóa đơn: ${Math.round(r.bill/1000)*1000}đ/tháng${kwhTxt} | Tiết kiệm dự kiến: ${saveFmt}đ/tháng (${r.saveRate}%) | Công suất đề xuất: ${r.power}kWp | Hoàn vốn: ~${r.paybackTxt} năm. Khách đã thấy kết quả này, KHÔNG hỏi lại hóa đơn. KHÔNG báo giá chi phí cụ thể – giá phụ thuộc thực tế, phải khảo sát.`;
 
   // Nếu chat chưa mở → mở và greet bằng kết quả thật
   if (!isOpen) {
@@ -1355,6 +1501,7 @@ function llBridgeCalcResult(r) {
     (function(){var b=document.getElementById("ll-bubble-hint");if(b){b.style.opacity="0";b.style.transform="translateY(8px)";b.style.pointerEvents="none";setTimeout(function(){if(b.parentNode)b.parentNode.removeChild(b);},250);}})();
     // Greeting thông minh dựa vào số thật
     const msg = `Em vừa tính xong cho anh/chị rồi ạ! 🌞\n\n`
+      + `Nhóm tính: **${typeTxt}**${kwhTxt ? `\n${kwhTxt.replace(' | ', '')}` : ''}\n`
       + `**Tiết kiệm dự kiến: ${saveFmt}đ/tháng** (${r.saveRate}% hóa đơn)\n`
       + `Hệ phù hợp: **${r.power}kWp** · Hoàn vốn ~${r.paybackTxt} năm\n\n`
       + `Anh/chị muốn em tư vấn cấu hình cụ thể (SolaX hay GoodWe) hay xem phương án trả góp không ạ?`;
@@ -1368,6 +1515,7 @@ function llBridgeCalcResult(r) {
   // Nếu chat đang mở và chưa có hội thoại → greet luôn
   if (isOpen && history.length === 0) {
     const msg = `Em vừa tính xong cho anh/chị rồi ạ! 🌞\n\n`
+      + `Nhóm tính: **${typeTxt}**${kwhTxt ? `\n${kwhTxt.replace(' | ', '')}` : ''}\n`
       + `**Tiết kiệm dự kiến: ${saveFmt}đ/tháng** (${r.saveRate}% hóa đơn)\n`
       + `Hệ phù hợp: **${r.power}kWp** · Hoàn vốn ~${r.paybackTxt} năm\n\n`
       + `Anh/chị muốn em tư vấn cấu hình cụ thể (SolaX hay GoodWe) hay xem phương án trả góp không ạ?`;
